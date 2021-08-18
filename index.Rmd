@@ -12,6 +12,14 @@ output:
 
 [This assignment is for ETC5521 Assignment 1 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
 
+
+```{r}
+library(tidyr)
+library(tibble)
+library(dplyr)
+```
+
+
 ```{r}
 
 
@@ -32,6 +40,49 @@ earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidyt
 # Data description
 
 A data description should tell the reader the source of the data, and detail the structure of the data, including variables and their types, time frame of collection, collection methods.
+
+# Data description
+
+The datasets come from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m), specifically table *cpsaat17* across several years.
+The **employed** dataset tells about employed persons by industry, sex, race, and occupation through 2015 to 2020.
+```{r}
+tribble(
+  ~Variable, ~Type,
+  "industry", "character",
+  "major_occupation", "character",
+  "minor_occupation", "character",
+  "race_gender", "character",
+  "industry_total", "double",
+  "employ_n", "double",
+  "year", "integer"
+)
+```
+
+The **earn** dadtaset tells about weekly median earnings and number of persons employed by race/gender/age group through 2010 to 2020.
+```{r}
+tribble(
+  ~Variable, ~Type,
+  "sex", "character",
+  "race", "character",
+  "ethnic_origin", "character",
+  "age", "character",
+  "year", "integer",
+  "quarter", "integer",
+  "n_persons", "double",
+  "median_weekly_income", "integer"
+)
+```
+The datasets are collected from the Current Population Survey (CPS) which is a monthly survey of households conducted by the Bureau of Census for the Bureau of Labor Statistics.
+
+Based on the datasets, three questions are going to be explored and analyzed in the following section, including:
+
+- what are the changes of people employed in different industries from 2015 to 2020?
+ 
+- what are the demographic differences between industries from 2015 to 2020?
+
+- how do different factors affect the income between 2010 and 2020?
+
+
 
 # Analysis and findings
 
