@@ -22,7 +22,11 @@ earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidyt
 
 ```
 
-
+```{r}
+library(tidyverse)
+library(ggstream)
+library(gganimate)
+```
 
 
 # Introduction and motivation
@@ -31,10 +35,198 @@ earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidyt
 
 # Data description
 
-A data description should tell the reader the source of the data, and detail the structure of the data, including variables and their types, time frame of collection, collection methods.
+The datasets come from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m), specifically table *cpsaat17* across several years.
+The **employed** dadtaset tells about employed persons by industry, sex, race, and occupation through 2015 to 2020.
+```{r}
+tribble(
+  ~Variable, ~Type,
+  "industry", "character",
+  "major_occupation", "character",
+  "minor_occupation", "character",
+  "race_gender", "character",
+  "industry_total", "double",
+  "employ_n", "double",
+  "year", "integer"
+)
+```
+
+The **earn** dadtaset tells about weekly median earnings and number of persons employed by race/gender/age group through 2010 to 2020.
+```{r}
+tribble(
+  ~Variable, ~Type,
+  "sex", "character",
+  "race", "character",
+  "ethnic_origin", "character",
+  "age", "character",
+  "year", "integer",
+  "quarter", "integer",
+  "n_persons", "double",
+  "median_weekly_income", "integer"
+)
+```
+The datasets are collected from the Current Population Survey (CPS) is a monthly survey of households conducted by the Bureau of Census for the Bureau of Labor Statistics.
+
+
 
 # Analysis and findings
 
 [FILL] Should include at least one plot or numerical summary for each of your questions, that helps the reader arrive at an answer. You should also write paragraphs describing the methods, summaries and findings. 
+
+
+
+```{r}
+earn <- earn %>% 
+  mutate(year = as.factor(year),
+         quarter = as.factor(quarter))
+earn_all <- earn %>% 
+  filter(sex == "Both Sexes",
+         race == "All Races",
+         ethnic_origin == "All Origins",
+         age == "16 years and over")
+```
+
+
+## The impact of different years & quarters on income
+
+```{r}
+p <- earn_all %>%
+  ggplot(aes(x = quarter,
+             y = median_weekly_earn,
+             color = year)) +
+  geom_line(aes(group = year), size = 1) +
+  geom_point() +
+  theme_bw()
+
+p + transition_time(as.integer(year)) + 
+  labs(title = "year: {as.integer(frame_time)}")
+```
+
+
+## The number of people in different income level
+
+```{r}
+# install.packages("ggstream")
+
+colors <- c("#6181BD4E","#F348004E","#64A10E4E","#9300264E")
+earn %>% 
+  filter(sex == "Both Sexes",
+         race == "All Races",
+         ethnic_origin == "All Origins",
+         age == "16 years and over") %>%
+  mutate(income_level = cut(median_weekly_earn, 
+                            c(fivenum(earn$median_weekly_earn)))) %>%
+  group_by(income_level, year) %>%
+  summarise(total_persons = sum(n_persons)) %>% 
+  ggplot(aes(x = year, y = total_persons, fill = income_level)) +
+  geom_stream(type = "proportional", bw = 1) +
+  scale_fill_manual(values = colors) +
+  cowplot::theme_minimal_vgrid() +
+  labs(x = "Year", y = "Proportion")
+```
+
+
+#### Then what about the income level [318, 605]
+```{r}
+earn %>% 
+  filter(median_weekly_earn <= quantile(median_weekly_earn, 0.25))
+
+
+```
+
+
+#### What happened to the "Hispanic or Latino"?
+
+```{r}
+earn %>%
+  filter(ethnic_origin != "All Origins",
+         sex == "Both Sexes",
+         race == "All Races",
+         age == "16 years and over") %>%
+  ggplot(aes(x = year, y = median_weekly_earn)) +
+  geom_boxplot() +
+  scale_y_continuous(name = "Median Weekly Earn", breaks = c(500,550,600,650,700,750,800)) +
+  theme_bw() +
+  coord_flip()
+
+```
+
+
+
+## How race & sex affect earnings
+
+```{r}
+earn %>%
+  filter(sex != "Both Sexes",
+         race != "All Races",
+         ethnic_origin == "All Origins",
+         age == "16 years and over") %>%
+  group_by(year, sex, race) %>%
+  summarise(median_weekly_earn = sum(median_weekly_earn)) %>%
+  pivot_wider(id_cols = c(race, year),
+              names_from = sex,
+              values_from = median_weekly_earn) %>%
+  ggplot() +
+  geom_segment(aes(x = year, xend = year, y = Men, yend = Women, colour = race)) +
+  geom_point(aes(x = year, y = Men, colour = race)) + 
+  geom_point(aes(x = year, y = Women, colour = race)) +
+  ylab("Median Weekly Earn") +
+  xlab("Year") +
+  theme_bw()
+
+```
+
+
+
+```{r}
+# install.packages("magick")
+plot_theme <- theme_bw() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_line(linetype = "dashed", color = "darkgrey"),
+    panel.grid.minor.y = element_blank(),
+    axis.text.x = element_blank()
+  )
+earn %>%
+  filter(age %in% c("16 to 24 years", "25 to 34 years", "35 to 44 years", "45 to 54 years", "55 years and over"),
+         sex == "Both Sexes",
+         race == "All Races",
+         ethnic_origin == "All Origins") %>%
+  group_by(year, age) %>% 
+  summarise(mean = mean(median_weekly_earn)) %>%
+  ggplot(aes(x = age, y = mean)) +
+  geom_col(aes(fill = age) ,position = "dodge", size = 1) +
+# coord_flip() +
+  xlab("Year") +
+  scale_fill_brewer(palette = 1) +
+  scale_y_continuous(breaks = c(fivenum(earn$median_weekly_earn))) +
+  plot_theme +
+  labs(title = 'Median Weekly Earn per Year: {closest_state}', subtitle = "Across different Age Groups") +
+  transition_states(year)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # References
