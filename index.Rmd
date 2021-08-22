@@ -41,7 +41,7 @@ earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidyt
 
 # Data description
 
-The datasets come from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m), specifically table *cpsaat17* across several years.
+The datasets come from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m), specifically table *cpsaat17* across several years.  
 The **employed** dataset tells about employed persons by industry, sex, race, and occupation through 2015 to 2020.
 ```{r}
 tribble(
@@ -76,11 +76,11 @@ The datasets are collected from the Current Population Survey (CPS) which is a m
 
 Based on the datasets, three questions are going to be explored and analyzed in the following section, including:
 
-- what are the changes of people employed in different industries from 2015 to 2020?
+- What are the changes of people employed in different industries from 2015 to 2020?
  
-- what are the demographic differences between industries from 2015 to 2020?
+- What are the demographic differences between industries from 2015 to 2020?
 
-- how do different factors affect the income between 2010 and 2020?
+- How do different factors affect the income between 2010 and 2020?
 
 
 # Analysis and findings
@@ -263,7 +263,7 @@ earn %>%
   transition_states(year)
 ```
 
-Based on the figure above, income levels at different age groups are shown. Here, the Y-axis is divided by the minimum, 1/4 quantile, median, 3/4 quantile and maximum income of the total population. The plot interactively demonstrates that young adults earn much less than middle-aged people and there's not much difference in age groups over 35.
+Based on the figure above, income levels at different age groups are shown. Here, the Y-axis is divided by the minimum, 1/4 quantile, median, 3/4 quantile and maximum income of the total. The plot interactively demonstrates that young adults earn much less than middle-aged people and there's not much difference in age groups over 35.
 
 #### Ethnic Origin
 
@@ -279,7 +279,10 @@ earn %>%
   geom_boxplot() +
   scale_y_continuous(name = "Median Weekly Earn", breaks = c(500,550,600,650,700,750,800)) +
   theme_bw() +
-  coord_flip()
+  coord_flip() +
+  annotate("text", x = 5, y = 700, color = "black", label = "Total Median: 755") +
+  annotate("text", x = 4, y = 700, color = "black", label = "Total 1/4 Quantile: 605") +
+  annotate("text", x = 3, y = 700, color = "black", label = "Total Minimum: 318")
 
 ```
 Compare to the median weekly income of total, the boxplot illustrates roughly low income for Hispanics or Latinos, even lower than the black or African American. The possible reasons for the circumstance can be related to education level, personal will, government support, employment discrimination, etc.
