@@ -180,7 +180,7 @@ Race <- employed %>%
 
 ```
 
-```{r fig.height=20, fig.width=9, fig.align = 'center', fig.align = "The changes of total number of people employed in terms of race from 2015 to 2020"}
+```{r fig.height=20, fig.width=9, fig.align = 'center', fig.cap = "The changes of total number of people employed in terms of race from 2015 to 2020"}
 Race_all <- Race %>%
   ggplot(aes(x = year, y = industry_total, color=Race)) +
   geom_line() +
@@ -281,7 +281,7 @@ Based on the figure above, income levels at different age groups are shown. Here
 
 Since the data breaks out only for the ethnic origin of Hispanics or Latinos who are minorities in the United States, let's just plot their income and see if there's any difference.
 
-```{r fig.align = 'center'}
+```{r fig.align = 'center', fig.cap = "Median weekly earn of Hispanics or Latinos"}
 earn %>%
   filter(ethnic_origin != "All Origins",
          sex == "Both Sexes",
