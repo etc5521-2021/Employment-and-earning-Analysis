@@ -24,6 +24,7 @@ library(ggplot2)
 library(ggstream)
 library(gganimate)
 library(plotly)
+library(kableExtra)
 ```
 
 
@@ -37,13 +38,7 @@ earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidyt
 
 # Introduction and motivation
 
-##!!!!!!!!![FILL] Give the bigger picture of the data, and inspire the reader to learn more about the problem by reading your analysis. 
-
-Option1:
-The data collected from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m) mainly focuses on the employment and earnings status in the labor force which promote us to explore and conduct a detailed analysis in regards to the diversity in different industries in the USA.
-
-Option2:
-### Gender and race have always been concerns in the workplace, which will be very helpful in looking through the fairness, equality and diversity. It raises our interest on exploring and conducting a detailed analysis in regards to the employment and earnings in different industries in the USA, using the data collected from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m).###
+Gender and race have always been concerns in the workplace, which will be very helpful in looking through the fairness, equality and diversity. It raises our interest on exploring and conducting a detailed analysis in regards to the employment and earnings in different industries in the USA, using the data collected from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md).   
 
 However, due to the limitation of data including inadequate information about different regions and inconsistency of two datasets in terms of the time frame, the outcome of the analysis would be affected.
 
@@ -53,7 +48,7 @@ The datasets originally come from [BLS](https://www.bls.gov/cps/tables.htm#chare
 
 The **employed** dataset tells about employed persons by industry, sex, race, and occupation through 2015 to 2020.
 ```{r}
-tribble(
+employtable <- tribble(
   ~Variable, ~Type,
   "industry", "character",
   "major_occupation", "character",
@@ -64,11 +59,13 @@ tribble(
   "year", "integer"
 ) %>%
   as.data.frame()
+kable(employtable) %>%
+  kable_styling("striped", position = 'center')
 ```
 
-The **earn** dadtaset tells about weekly median earnings and number of persons employed by race/gender/age group through 2010 to 2020.
+The **earn** dataset tells about weekly median earnings and number of persons employed by race/gender/age group through 2010 to 2020.
 ```{r}
-tribble(
+earntable <- tribble(
   ~Variable, ~Type,
   "sex", "character",
   "race", "character",
@@ -80,6 +77,8 @@ tribble(
   "median_weekly_income", "integer"
 ) %>%
   as.data.frame()
+kable(earntable) %>%
+  kable_styling("striped", position = 'center')
 ```
 The datasets are collected from the Current Population Survey (CPS) which is a monthly survey of households conducted by the Bureau of Census for the Bureau of Labor Statistics.
 
@@ -108,23 +107,19 @@ industry <- employed %>%
   
 ```
 
-```{r}
+```{r fig.align = 'center', fig.cap= "Total number of people employed in industries"}
 employed_in_each_industry <- industry %>%
   ggplot(aes(x=year, y =no_of_people_employed, color=industry)) +
   geom_line()+
   labs(
-    title = "The changes of total number of people employed in each industries from 2015 to 2020",
     color = "industry",
-    x = "year",
+    x = "",
     y = "The number of people employed") +
   theme_bw() +
   theme(plot.title = element_text(hjust = "0.5", size = 15))
 ggplotly(employed_in_each_industry)
 ```
 First of all, the graph shown above indicates the changes of all the population of employees from different industries in recent 5 years. To be more specific, there is a large number of people working in the industry of education and health services, and the population stayed stably between 34 million and 35 million during 2015 to 2020. However, as the industry of private households hold the least population, the number of people employed in this industry actually decreased from around 0.7 million to 0.6 million. In addition, all industries experienced the decrease of people employed within the industries from 2019 to 2020 except for the public administration. 
-
-
-###考虑是否加一个summary/table###
 
 
 ### What are the demographic differences between industries from 2015 to 2020?
@@ -153,18 +148,18 @@ Gender <- employed %>%
   unique()
 ```
 
-```{r fig.height=50, fig.width=20}
+```{r fig.height=20, fig.width=10, fig.align = 'center', fig.cap = "The differences between male and female employed in industries between 2015 and 2020"}
 Gender_all <-Gender %>%
   ggplot(aes(x = year, y = industry_total, fill = Gender)) +
   geom_bar(stat = "identity", position = "dodge") +
   theme_bw()+
-  facet_wrap(~industry, scales = "free_y")+
+  facet_wrap(~industry)+
   labs(
-    title = "The differences between male and female employed in industries between 2015 and 2020",
     color = "Gender",
-    x = "year",
+    x = "",
     y = "The number of people employed") +
   theme_bw() +
+  theme_bw(base_size = 10) +
   theme(plot.title = element_text(hjust = "0.5", size = 15))
 ggplotly(Gender_all)
 ```
@@ -185,18 +180,20 @@ Race <- employed %>%
 
 ```
 
-```{r fig.height=20, fig.width=20}
+```{r fig.height=20, fig.width=9, fig.align = 'center', fig.align = "The changes of total number of people employed in terms of race from 2015 to 2020"}
 Race_all <- Race %>%
   ggplot(aes(x = year, y = industry_total, color=Race)) +
   geom_line() +
-  facet_wrap(~industry, scales = "free_y")+
+  facet_wrap(~industry, scales = "free_y", ncol = 4) +
   labs(
-    title = "The changes of total number of people employed in terms of race from 2015 to 2020",
     color = "Race",
-    x = " year",
+    x = "",
     y = "The number of people employed") +
   theme_bw() +
-  theme(plot.title = element_text(hjust = "0.5", size = 15))
+  theme_bw(base_size = 10) +
+  theme(plot.title = element_text(hjust = "0.5", size = 15)) +
+  theme(axis.text.y = element_text(angle = 55, hjust = 10, vjust = 20)) + 
+  theme(legend.position = "none")
 ggplotly(Race_all)
 ```
 When looking at the relationships between industries and the population employed among races from the data, most of the people employed among all the industries are white people, following by Black or African American and Asian. 
@@ -219,7 +216,7 @@ Let's now take a look at the earning data, median weekly income varies through d
 
 #### Gender & Race
 
-```{r}
+```{r fig.align = 'center'}
 earn %>%
   filter(sex != "Both Sexes",
          race != "All Races",
@@ -248,7 +245,7 @@ First of all, the above plot shows apparent relationship among gender, race and 
 
 #### Age group
 
-```{r}
+```{r fig.align = 'center'}
 # install.packages("magick")
 plot_theme <- theme_bw() +
   theme(
@@ -270,6 +267,7 @@ earn %>%
   geom_text(aes(label = round(mean, 1)))+
 # coord_flip() +
   xlab("Year") +
+  ylab("Mean of median weekly earn") +
   scale_fill_brewer(palette = 1) +
   scale_y_continuous(breaks = c(fivenum(earn$median_weekly_earn))) +
   plot_theme +
@@ -283,7 +281,7 @@ Based on the figure above, income levels at different age groups are shown. Here
 
 Since the data breaks out only for the ethnic origin of Hispanics or Latinos who are minorities in the United States, let's just plot their income and see if there's any difference.
 
-```{r}
+```{r fig.align = 'center'}
 earn %>%
   filter(ethnic_origin != "All Origins",
          sex == "Both Sexes",
@@ -292,13 +290,15 @@ earn %>%
   ggplot(aes(x = year, y = median_weekly_earn)) +
   geom_boxplot() +
   scale_y_continuous(name = "Median Weekly Earn", breaks = c(500,550,600,650,700,750,800)) +
+  xlab("") +
   theme_bw() +
   coord_flip() +
   annotate("text", x = 5, y = 700, color = "black", label = "Total Median: 755") +
   annotate("text", x = 4, y = 700, color = "black", label = "Total 1/4 Quantile: 605") +
   annotate("text", x = 3, y = 700, color = "black", label = "Total Minimum: 318")
 
-```
+```  
+   
 Compare to the median weekly income of total, the boxplot illustrates roughly low income for Hispanics or Latinos, even lower than the black or African American. The possible reasons for the circumstance can be related to education level, personal will, government support, employment discrimination, etc.
 
 
@@ -306,9 +306,15 @@ Compare to the median weekly income of total, the boxplot illustrates roughly lo
 
 # Conclusion
 
+Combining these two data analysis on the employment situation and income level in the United States, we can get some preliminary conclusions:  
 
+1. In terms of gender, industries that are overwhelmingly male generally require more physical labor and technical skills, while industries with more women generally require more patience and carefulness. On this basis, men generally earn more than women, which illustrates that a higher level of technology or professional skills may lead to higher income.   
 
+2. In terms of race, the number of white people employed is much higher than that of other races. On the one hand, the white population base in the United States is much higher than that of Asians, and on the other hand, whites are not subject to racial discrimination while blacks or African Americans are often the first victims. However, from the income, we find that Asians earn the most. This is mainly due to the fact that Asian immigrants to the United States generally have high education and/or high technology, and generally have high economic strength and educational level, including overseas students. Thus, their income is relatively high. Blacks and Hispanics or Latinos earn less possibly because of employment discrimination or laziness.   
 
+3. In terms of age groups, middle aged people earn most, a lot higher than young adults, which is rather reasonable. This indicates that the United States attaches great importance to work experience and has a relatively stable prospect of promotion and salary increase, which to some extent reflects the sound and stable corporate policy and roughly perfect social welfare system in the United States.   
+
+4. The decline in U.S. employment from 2019 to 2020 is likely due to an increase in layoffs during the economic depression. (Possibly affected by COVID-19)  
 
 
 # References
@@ -317,41 +323,30 @@ Compare to the median weekly income of total, the boxplot illustrates roughly lo
 
 Labor Force Statistics from the Current Population Survey. (2021). Retrieved 15 August 2021, from https://www.bls.gov/cps/tables.htm#charemp_m
 
+Tidytuesday. (2021). Retrieved 15 August 2021, from https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md
+
+
 ### Software
 
-R Core Team (2020). R: A language and environment for statistical computing. R
-  Foundation for Statistical Computing, Vienna, Austria. URL
-  https://www.R-project.org/.
+R Core Team (2020). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
 
 
 ### Packages
 
-Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686,
-  https://doi.org/10.21105/joss.01686
-  
-#(confirm aigain with the APA 6th style)!!!!!!!!!!!!!!!!!!!!!!!!!!!#
+Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.5. https://CRAN.R-project.org/package=dplyr
 
+Hadley Wickham (2021). tidyr: Tidy Messy Data. R package version 1.1.3.https://CRAN.R-project.org/package=tidyr
 
-Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2021). dplyr: A Grammar of Data Manipulation.
-  R package version 1.0.5. https://CRAN.R-project.org/package=dplyr
+Hao Zhu (2021). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R package version 1.3.4. https://CRAN.R-project.org/package=kableExtra
 
-Hadley Wickham (2021). tidyr: Tidy Messy Data. R package version 1.1.3.
-  https://CRAN.R-project.org/package=tidyr
-  
-Wilke, C.O. (2020). ggtext: Improved Text Rendering Support for 'ggplot2'.
-  R package version 0.1.1. https://CRAN.R-project.org/package=ggtext
+JJ Allaire and Yihui Xie and Jonathan McPherson and Javier Luraschi and Kevin Ushey and Aron Atkins and Hadley Wickham and Joe Cheng and Winston Chang and Richard Iannone (2021). rmarkdown: Dynamic Documents for R. R package version 2.10. URL https://rmarkdown.rstudio.com.
 
-JJ Allaire and Yihui Xie and Jonathan McPherson and Javier Luraschi and Kevin Ushey and Aron Atkins and Hadley
-  Wickham and Joe Cheng and Winston Chang and Richard Iannone (2021). rmarkdown: Dynamic Documents for R. R
-  package version 2.10. URL https://rmarkdown.rstudio.com.
+Kirill Müller and Hadley Wickham (2021). tibble: Simple Data Frames. R package version 3.1.3. https://CRAN.R-project.org/package=tibble
 
-Yihui Xie and J.J. Allaire and Garrett Grolemund (2018). R Markdown: The Definitive Guide. Chapman and
-  Hall/CRC. ISBN 9781138359338. URL https://bookdown.org/yihui/rmarkdown.
+Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686
 
-Yihui Xie and Christophe Dervieux and Emily Riederer (2020). R Markdown Cookbook. Chapman and Hall/CRC. ISBN
-  9780367563837. URL https://bookdown.org/yihui/rmarkdown-cookbook.
+Wilke, C.O. (2020). ggtext: Improved Text Rendering Support for 'ggplot2'. R package version 0.1.1. https://CRAN.R-project.org/package=ggtext
 
-Kirill Müller and Hadley Wickham (2021). tibble: Simple Data Frames. R package version 3.1.3.
-  https://CRAN.R-project.org/package=tibble
-  
-##ggstream &gganimate havent cite!!##
+Yihui Xie and J.J. Allaire and Garrett Grolemund (2018). R Markdown: The Definitive Guide. Chapman and Hall/CRC. ISBN 9781138359338. URL https://bookdown.org/yihui/rmarkdown.
+
+Yihui Xie and Christophe Dervieux and Emily Riederer (2020). R Markdown Cookbook. Chapman and Hall/CRC. ISBN 9780367563837. URL https://bookdown.org/yihui/rmarkdown-cookbook.
