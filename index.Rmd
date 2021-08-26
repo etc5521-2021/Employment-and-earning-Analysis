@@ -85,10 +85,10 @@ The datasets are collected from the Current Population Survey (CPS) which is a m
 Here are some findings when looking through the methods used to tidy and wrangle data from the original source:  
 
 - employed data   
-Its raw data is in excel format. The tidytuesday author firstly took one year in the data as example to clean, using `slice()`, `rename()` etc functions to make the titles and data itself of the original table are clearly displayed in their proper place. Then, in order to have each variable corresponding to one column, `pivot_longer()` was used here. After that, the author got rid of those redundant character by `regexp` and selected the data that waas required. With these steps, it is almost done cleaning the data for a given year. What to do next is to create a function refer to the steps above and apply the function to all years then combine them. Yet, it's necessary to have the tidy data checked by simply make a plot using `ggplot2` function. Finally, output the data by `write_csv()`.  
+The raw data is in excel format. The author of tidytuesday firstly took one year in the data as an example to clean, using `slice()`, `rename()` etc functions to display the titles and data itself of the original table clearly and properly. Then, in order to have each variable corresponding to one column, `pivot_longer()` was used. After that, the author got rid of those redundant characters by `regexp` and selected the required data. With these steps, it is about to finish cleaning the data for a given year. What to do next is to create a function referring to the steps above and apply the function to combine all years. Yet, it's necessary to have the tidy data checked by simply making a plot using `ggplot2` function. Finally, the data can be output by `write_csv()`.  
 
 - earn data  
-Its raw data is in excel format. The author changed it to a table format using `html_nodes()` and `html_table()`. Similarly as in the employed data, a function was created and data was combined together with the functions `bind_rows()` and `left_join()`. Then similar steps followed, through basic tidy methods like `filter()`, `select()`, `mutate()` etc, we got the final cleaned data. Last but not least, check the data and output it.
+The raw data is in excel format. The author changed it to a table format using `html_nodes()` and `html_table()`. Similarly as in the employed data, a function was created and data was combined together with the functions `bind_rows()` and `left_join()`. Then, with similar steps,the final cleaned data can be acquired through basic tidy methods like `filter()`, `select()`, `mutate()` etc. Last but not the least, the data can be checked and output.
 
 
 Based on the datasets, three questions are going to be explored and analyzed in the following section, including:
@@ -220,8 +220,7 @@ earn_all <- earn %>%
          age == "16 years and over")
 ```
 
-
-Let's now take a look at the earning data, median weekly income varies through different genders, races, ethnic origins and age groups.
+When taking a look at the earning data, median weekly income varies through different genders, races, ethnic origins and age groups.
 
 #### Gender & Race
 
@@ -250,7 +249,7 @@ earn %>%
 
 ```
 
-First of all, the above plot shows apparent relationship among gender, race and weekly income through years. There's a obvious upward trend in income year by year, the upper vertex of the segments represents male's income and the lower one represents female's, which clearly shows that men generally earn more than women. Besides, the plot indicates that race is also a key factor affecting income. Asian earns the most, followed by the white race while the black or African American earns the least. This may reflect differences in the amount of time and energy that people of different races are willing to devote to their jobs. On the other hand, racial discrimination may also play a role.
+The above plot shows apparent relationship among gender, race and weekly income through years. There's a obvious upward trend in income year by year, the upper vertex of the segments represents male's income and the lower one represents female's, which clearly shows that men generally earn more than women. Besides, the plot indicates that race is also a key factor affecting income. Asian earns the most, followed by the white race while the black or African American earns the least. This may reflect differences in the amount of time and energy that people of different races are willing to devote to their jobs. On the other hand, racial discrimination may also play a role.
 
 #### Age group
 
@@ -315,7 +314,7 @@ Compare to the median weekly income of total, the boxplot illustrates roughly lo
 
 # Conclusion
 
-Combining these two data analysis on the employment situation and income level in the United States, we can get some preliminary conclusions:  
+Combining these two data analysis on the employment situation and income level in the United States, some preliminary conclusions can be drawn:  
 
 1. In terms of gender, industries that are overwhelmingly male generally require more physical labor and technical skills, while industries with more women generally require more patience and carefulness. On this basis, men generally earn more than women, which illustrates that a higher level of technology or professional skills may lead to higher income.   
 
