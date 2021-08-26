@@ -82,6 +82,15 @@ kable(earntable) %>%
 ```
 The datasets are collected from the Current Population Survey (CPS) which is a monthly survey of households conducted by the Bureau of Census for the Bureau of Labor Statistics.
 
+Here are some findings when looking through the methods used to tidy and wrangle data from the original source:  
+
+- employed data   
+Its raw data is in excel format. The tidytuesday author firstly took one year in the data as example to clean, using `slice()`, `rename()` etc functions to make the titles and data itself of the original table are clearly displayed in their proper place. Then, in order to have each variable corresponding to one column, `pivot_longer()` was used here. After that, the author got rid of those redundant character by `regexp` and selected the data that waas required. With these steps, it is almost done cleaning the data for a given year. What to do next is to create a function refer to the steps above and apply the function to all years then combine them. Yet, it's necessary to have the tidy data checked by simply make a plot using `ggplot2` function. Finally, output the data by `write_csv()`.  
+
+- earn data  
+Its raw data is in excel format. The author changed it to a table format using `html_nodes()` and `html_table()`. Similarly as in the employed data, a function was created and data was combined together with the functions `bind_rows()` and `left_join()`. Then similar steps followed, through basic tidy methods like `filter()`, `select()`, `mutate()` etc, we got the final cleaned data. Last but not least, check the data and output it.
+
+
 Based on the datasets, three questions are going to be explored and analyzed in the following section, including:
 
 - What are the changes of people employed in different industries from 2015 to 2020?
