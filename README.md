@@ -1,3 +1,11 @@
+# ETC5521 Assignment 2
+
+Team members:
+
+* [Sahinya Akila]
+* [Xinrui Wang]
+
+
 # ETC5521 Assignment 1 
 
 Team name: [cassowary]
