@@ -1,16 +1,16 @@
 ---
-title: "ETC5521 Assignment 1"
+title: "ETC5521 Assignment 2"
 subtitle: "Employment and Earnings"
 team: Cassowary
 author:
-  - Kexin Xu
-  - Lintian Zhang
+  - Sahinya Akila
+  - Xinrui Wang
 date: "`r Sys.Date()`"
 output: 
   html_document
 ---
 
-[This assignment is for ETC5521 Assignment 1 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
+[This assignment is for ETC5521 Assignment 2 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
@@ -36,13 +36,13 @@ earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidyt
 
 
 
-# Introduction and motivation
+# Introduction and motivation - Rachel to edit
 
 Gender and race have always been concerns in the workplace, which will be very helpful in looking through the fairness, equality and diversity. It raises our interest on exploring and conducting a detailed analysis in regards to the employment and earnings in different industries in the USA, using the data collected from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md).   
 
 However, due to the limitation of data including inadequate information about different regions and inconsistency of two datasets in terms of the time frame, the outcome of the analysis would be affected.
 
-# Data description
+# Data description - Sahinya to edit
 
 The datasets originally come from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m), specifically table *cpsaat17* across several years.  
 
@@ -98,11 +98,12 @@ Based on the datasets, three questions are going to be explored and analyzed in 
 - What are the demographic differences between industries from 2015 to 2020?
 
 - How do different factors affect the income between 2010 and 2020?
-
+  - how significant is gender, race and age group in affecting earnings (regression) - Rachel
+  
 
 # Analysis and findings
 
-### What are the changes of people employed in different industries from 2015 to 2020?
+### What are the changes of people employed in different industries from 2015 to 2020? - Sahinya to edit
 
 ```{r}
 industry <- employed %>%
@@ -131,7 +132,7 @@ ggplotly(employed_in_each_industry)
 First of all, the graph shown above indicates the changes of all the population of employees from different industries in recent 5 years. To be more specific, there is a large number of people working in the industry of education and health services, and the population stayed stably between 34 million and 35 million during 2015 to 2020. However, as the industry of private households hold the least population, the number of people employed in this industry actually decreased from around 0.7 million to 0.6 million. In addition, all industries experienced the decrease of people employed within the industries from 2019 to 2020 except for the public administration. 
 
 
-### What are the demographic differences between industries from 2015 to 2020?
+### What are the demographic differences between industries from 2015 to 2020? - Sahinya to edit
 
 #### Gender
 
@@ -207,7 +208,7 @@ ggplotly(Race_all)
 ```
 When looking at the relationships between industries and the population employed among races from the data, most of the people employed among all the industries are white people, following by Black or African American and Asian. 
 
-### How do different factors affect the income between 2010 and 2020?
+### How do different factors affect the income between 2010 and 2020? - Rachel to edit
 
 ```{r}
 earn <- earn %>% 
@@ -312,7 +313,7 @@ Compare to the median weekly income of total, the boxplot illustrates roughly lo
 
 
 
-# Conclusion
+# Conclusion - Rachel to edit
 
 Combining these two data analysis on the employment situation and income level in the United States, some preliminary conclusions can be drawn:  
 
