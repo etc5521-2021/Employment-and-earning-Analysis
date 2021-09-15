@@ -323,11 +323,20 @@ summary(model) %>%
   scroll_box(width = "100%", height = "300px")
 ```
 
-Table \@ref(tab:reg)
+A linear regression model is then fitted as shown in Table \@ref(tab:reg), **the p values for Women, Black or African American and White are all extremely close to 0, indicates that they are significant in this model**. The estimates of coefficients of years are all positive and gradually increasing from 2010 to 2020, which align with the previous findings that median weekly income increase over years overall. The fitted model can be written as per below:
 
-```{r}
+$$MedianWeeklyEarn = 909.3758 - 150.8788*Women - 278.7114*BlackorAfricanAmerican - 110.8727*White +...+271.833*Year2020$$
+
+According to the model, the median weekly income of women in general is 150.8788 dollars lower than women, whereas the median weekly income of Black or African American and White are 278.7114 and 110.8727 dollars lower compare with Asian respectively. Therefore, among all the variables of interest, **Black or African American in race has the most impact on median weekly income, followed by women and White in race.**
+
+Regression diagnostics for the model are also conducted to examine the goodness of fit, overall, the fitted model can explain part of the variations within the data, but there is room for improvements by introducing additional datasets and potentially more variables. 
+
+```{r fig8, fig.cap="Diagnostics for the fitted model"}
 resid_panel(model, plots = "SAS")
 ```
+
+Discreteness can be clearly observed from the residual plot in Figure \@ref(fig:fig8), it is mainly caused by the nature of the independent variables used in the model, all independent variables are categorical i.e. discrete in the model, hence the discreteness in residual plot is not surprising. In addition, both R squared and adjusted R squared for the fitted model is smaller than 0.5 as shown in Table \@ref(tab:fit), it suggests that only about 46% of the variation observed from the data is explained by the fitted model.
+
 ```{r fit}
 glance(model)%>% 
   select(r.squared,adj.r.squared, AIC, BIC) %>% 
@@ -336,8 +345,8 @@ glance(model)%>%
         caption = "Goodness of fit") %>% 
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
-Table \@ref(tab:fit)
 
+Based on the findings above, race, specifically Black or African American has significant impact on median weekly earnings in the US from 2010 to 2020, followed by gender and White, however, the model could be improved by adding more datasets and new variables such as industry, education level etc., and the findings may subject to change if new model is fitted.
 
 
 # Key Findings and Limitations - Rachel to edit
