@@ -7,13 +7,15 @@ author:
   - Xinrui Wang
 date: "`r Sys.Date()`"
 output: 
-  html_document
+  bookdown::html_document2:
+    toc: true
+    fig_caption: yes
 ---
 
 [This assignment is for ETC5521 Assignment 2 by Team `r rmarkdown::metadata$team` comprising of `r knitr::combine_words(rmarkdown::metadata$author)`.]{style="color:#006DAE;"}
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, error = FALSE)
 ```
 
 ```{r}
@@ -28,6 +30,7 @@ library(kableExtra)
 library(tidyverse)
 library(hrbrthemes)
 library(plotly)
+library(magick)
 ```
 
 
@@ -39,13 +42,15 @@ earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidyt
 
 
 
-# Introduction and motivation - Rachel to edit
+# Introduction and Motivation - Rachel to edit
 
-Gender and race have always been widely discussed topics in various social domains, including employment and earning. Fekedulegn et al. (2019) suggested that workplace discrimination and mistreatment varied significantly by race and gender in the US, this statement raises the interest on exploring and conducting a detailed analysis in regards to the employment and earnings across different industries in the USA, using the data collected from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md). By looking through the employment status and earning from 2015 to 2020 across different race, gender as well as age groups in various industries in the US, the findings will assist with promoting fairness, equality and diversity in the workplace.
+Gender and race have always been widely discussed topics in various social domains, including employment and earning. Fekedulegn et al. (2019) suggested that workplace discrimination and mistreatment varied significantly by race and gender in the US, this statement raises the interest on exploring and conducting a detailed analysis in regards to the employment and earnings across different industries in the USA, to find out if this statement is true and how significant gender and race are in affecting employment and earning.
 
-Analysis conducted and conclusions drew in this report are solely based on the datasets described under Data description section, all records in the datasets are assumed to be accurate. Furthermore, due to the limitation of data including inadequate information about different regions and inconsistency of two datasets in terms of the time frame, the outcome of the analysis would be affected.
+The data used in this report is collected from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md), by looking through the employment status and earning from 2010 to 2020 across different races, genders as well as age groups in various industries in the US, the findings will assist with promoting fairness, equality and diversity in the workplace.
 
-# Data description - Sahinya to edit
+Analysis conducted and conclusions drew in this report are solely based on the datasets described under Data Description section, all records in the datasets are assumed to be accurate. Furthermore, due to the inadequate information in regions and inconsistency of time frame in the two datasets used in this report, the findings could be subject to potential bias.
+
+# Data Description - Sahinya to edit
 
 The datasets originally come from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m), specifically table *cpsaat17* across several years.  
 
@@ -55,7 +60,9 @@ The **employed** dataset tells about employed persons by industry, sex, race, an
 employtable <- data_frame(Column_name = colnames(employed), 
                           data_type = sapply(employed, typeof),
                           description = c("Industry Group", "Major occupation category", "Minor occupation category", "Race & Gender wise information", "Industry total count", "Number of people employed", "Year")) 
-kable(employtable) %>%
+kable(employtable,
+      col.names = c("Variable", "Data Type", "Description"),
+      align = "l") %>%
   kable_styling("striped", position = 'center')
 ```
 
@@ -65,7 +72,9 @@ The **earn** dataset tells about weekly median earnings and number of persons em
 earntable <-data_frame(Column_name = colnames(earn), 
                           data_type = sapply(earn, typeof),
                           description = c("Gender", "Racial group", "Ethnic origin (hispanic or non-hispanic)", "Age group", "Year", "Quarter", "Number of persons employed by group", "Median weekly earning in current dollars")) 
-kable(earntable) %>%
+kable(earntable,
+      col.names = c("Variable", "Data Type", "Description"),
+      align = "l") %>%
   kable_styling("striped", position = 'center')
 ```
 
@@ -80,22 +89,24 @@ The raw data is in excel format. The author of tidytuesday firstly took one year
 The raw data is in excel format. The author changed it to a table format using `html_nodes()` and `html_table()`. Similarly as in the employed data, a function was created and data was combined together with the functions `bind_rows()` and `left_join()`. Then, with similar steps,the final cleaned data can be acquired through basic tidy methods like `filter()`, `select()`, `mutate()` etc. Last but not the least, the data can be checked and output.
 
 
-Based on the datasets, three questions are going to be explored and analyzed in the following section, including:
+Based on the datasets, five questions are going to be explored and analyzed in the following section, including:
 
 - What are the changes of people employed in different industries from 2015 to 2020?
  
 - What are the demographic differences between industries from 2015 to 2020?
 
+- At what age do men and women work the most and how does the age factor contribute towards employement?
+
 - How do different factors affect the income between 2010 and 2020?
 
-- how significant is gender, race and age group in affecting earnings (regression) - Rachel
+- How significant is gender and race in affecting earnings?
   
 
-# Analysis and findings
+# Analysis and Findings
 
-### What are the changes of people employed in different industries from 2015 to 2020? - Sahinya to edit
+## What are the changes of people employed in different industries from 2015 to 2020? - Sahinya to edit
 
-```{r, fig.width=10, fig.height=8, fig.align='center'}
+```{r fig1, message=FALSE, warning=FALSE, fig.width=10, fig.height=8, fig.align='center', fig.cap="Number of people employed across industry from 2015 to 2020"}
 
 options(scipen=1000)
 industry <- employed %>%
@@ -103,26 +114,26 @@ industry <- employed %>%
          !is.na(industry),
          !is.na(industry_total)) %>%
   select(industry, industry_total,year) %>%
-  rename(no_of_people_employed = `industry_total`) %>%
+  rename("Number of people employed" = `industry_total`) %>%
   group_by(year) %>%
   unique() %>%
   arrange(industry) %>%
-  mutate(industry = factor(industry, industry), text = paste0("Year: ", year, "\n", "Industry: ", industry, "\n", "Total Employed: ", no_of_people_employed))
+  mutate(industry = factor(industry, industry), text = paste0("Year: ", year, "\n", "Industry: ", industry, "\n", "Total Employed: ", `Number of people employed`))
 
-ggplot(industry, aes(year, industry, fill= no_of_people_employed, text = text)) + 
+ggplot(industry, aes(year, industry, fill= `Number of people employed`, text = text)) + 
   geom_tile(size=1, colour = "white") +
   theme_ipsum()
 
 ```
 
-First of all, the graph shown above indicates the changes of all the population of employees from different industries in recent 5 years. To be more specific, there is a large number of people working in the industry of education and health services, and the population stayed stably between 34 million and 35 million during 2015 to 2020. However, as the industry of private households hold the least population, the number of people employed in this industry actually decreased from around 0.7 million to 0.6 million. In addition, all industries experienced the decrease of people employed within the industries from 2019 to 2020 except for the public administration. 
+First of all, Figure \@ref(fig:fig1) shown above indicates the changes of all the population of employees from different industries in recent 5 years. To be more specific, there is a large number of people working in the industry of education and health services, and the population stayed stably between 34 million and 35 million during 2015 to 2020. However, as the industry of private households hold the least population, the number of people employed in this industry actually decreased from around 0.7 million to 0.6 million. In addition, all industries experienced the decrease of people employed within the industries from 2019 to 2020 except for the public administration. 
 
 
-### What are the demographic differences between industries from 2015 to 2020? - Sahinya to edit
+## What are the demographic differences between industries from 2015 to 2020? - Sahinya to edit
 
-#### Gender
+### Gender
 
-```{r, fig.width=10, fig.height=8, fig.align='center'}
+```{r fig2, fig.width=10, fig.height=8, fig.align='center', fig.cap="Distribution of men and women across industries"}
 Gender <- employed %>%
   filter(race_gender %in% c('Men','Women'),
          !is.na(industry),
@@ -134,7 +145,9 @@ Gender <- employed %>%
 
 p <- Gender %>% ggplot(aes(x = industry, y = industry_total, fill = industry)) +
   geom_col() +
-  theme_bw() + 
+  theme_bw() +
+  labs(x = "",
+       y = "") +
   theme(axis.text.x = element_text(angle = 90), legend.position="none") +
   facet_grid(year ~ Gender)
 
@@ -142,12 +155,12 @@ plotly::ggplotly(p)
 
 ```
 
-In the analysis about genders in different industries, it is found that there are only five industries that have more female employees than male, which are education and health services, financial activities, leisure and hospitality, other services and private households. Especially in the industry of education and services, the number of female employees is more than twice as much as the number of male employees. On the contrary, male workers occupy most of the roles in some industries like manufacturing, construction, transportation and utilities and durable goods. More than 90% of the employees are male in the industry of construction.
+In the analysis about genders in different industries, it is found that there are only five industries that have more female employees than male, which are education and health services, financial activities, leisure and hospitality, other services and private households (Figure \@ref(fig:fig2)). Especially in the industry of education and services, the number of female employees is more than twice as much as the number of male employees. On the contrary, male workers occupy most of the roles in some industries like manufacturing, construction, transportation and utilities and durable goods. More than 90% of the employees are male in the industry of construction.
 
 
-#### Race
+### Race
 
-```{r, fig.width=12, fig.height=8, fig.align='left'}
+```{r fig3, fig.width=12, fig.height=8, fig.align='left', fig.cap="Distribution of different races across industries"}
 Race <- employed %>%
   filter(race_gender %in% c('White','Black or African American', 'Asian'),
          !is.na(industry),
@@ -160,17 +173,20 @@ Race <- employed %>%
 p <- Race %>% ggplot(aes(x = industry, y = industry_total, fill = industry)) +
   geom_col() +
   theme_bw() + 
+  labs(x = "",
+       y = "") +
   theme(axis.text.x = element_text(angle = 90), legend.position="none") +
   facet_grid(year ~ Race)
 
 plotly::ggplotly(p)
 
 ```
-When looking at the relationships between industries and the population employed among races from the data, most of the people employed among all the industries are white people, following by Black or African American and Asian. 
 
-### At what age do men and women work the most and how does the age factor contribute towards employement? - Sahinya
+According to Figure \@ref(fig:fig3), when looking at the relationships between industries and the population employed among races from the data, most of the people employed among all the industries are white people, following by Black or African American and Asian. 
 
-```{r}
+## At what age do men and women work the most and how does the age factor contribute towards employement? - Sahinya
+
+```{r fig4, fig.cap="Employment rate by gender and age group"}
 total <- sum(earn$n_persons)
 earn %>% 
   filter(sex %in% c("Men", "Women")) %>% 
@@ -182,9 +198,9 @@ earn %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-It can be observed from the figure that both men and women in between the age 16 to 54 have been employed more when compared to other age groups. It is also evident that the number of male employees are more when compared to women. There is a peak in 25-54 age group as this is the age when people finish education and start their career. This also happens to be the prime working time in most of their lives. As one intends the curve to be, there is a peak and the 25-54 age group and the numbers slowly go down after 55 years as people start their retirement phase.  
+It can be observed from Figure \@ref(fig:fig4) that both men and women in between the age 16 to 54 have been employed more when compared to other age groups. It is also evident that the number of male employees are more when compared to women. There is a peak in 25-54 age group as this is the age when people finish education and start their career. This also happens to be the prime working time in most of their lives. As one intends the curve to be, there is a peak and the 25-54 age group and the numbers slowly go down after 55 years as people start their retirement phase.  
 
-### How do different factors affect the income between 2010 and 2020? - Rachel to edit
+## How do different factors affect the income between 2010 and 2020? - Rachel to edit
 
 ```{r}
 earn <- earn %>% 
@@ -197,11 +213,11 @@ earn_all <- earn %>%
          age == "16 years and over")
 ```
 
-When taking a look at the earning data, median weekly income varies through different genders, races, ethnic origins and age groups.
+When taking a look at the earning data, median weekly income varies through different genders, races and age groups.
 
-#### Gender & Race
+### Gender & Race
 
-```{r fig.align = 'center'}
+```{r fig5, fig.align = 'center', fig.cap="Race and gender do play significant role in income"}
 earn %>%
   filter(sex != "Both Sexes",
          race != "All Races",
@@ -220,18 +236,16 @@ earn %>%
   annotate("text", x = 3, y = 1280, color = "black", label = "Lower Vertex: Women") +
   ylab("Median Weekly Earn") +
   xlab("Year") +
-  ggtitle("How race and gender affect income?") +
   theme_bw() +
   scale_colour_manual(values=c("#00b0f6","#71CA97", "#ff7f7f"))
 
 ```
 
-The above plot shows apparent relationship among gender, race and weekly income through years. There's a obvious upward trend in income year by year, the upper vertex of the segments represents male's income and the lower one represents female's, which clearly shows that men generally earn more than women. Besides, the plot indicates that race is also a key factor affecting income. Asian earns the most, followed by the white race while the black or African American earns the least. This may reflect differences in the amount of time and energy that people of different races are willing to devote to their jobs. On the other hand, racial discrimination may also play a role.
+Figure \@ref(fig:fig5) indicates that gender and race do play significant role in affecting weekly income through the past ten years. A clear upward trend in income can be observed in general over the period, the upper vertex of the segments represents male's income and the lower one represents female's, which clearly shows that men generally earn more than women in all years and races from 2010 to 2020. In addition, the plot suggests that race is also a key factor affecting income. **A surprising finding is that while the number of Asians employed are very low across all industries, Asians actually have the highest median weekly income among the three races recorded,** followed by the white race while the black or African American earns the least. This may reflect differences in the amount of time and energy that people of different races are willing to devote to their jobs, Asians are well-known for hard working and are more likely to work extra hours compare with the other two races. On the other hand, another possible reason is that there is a common belief that Asians are smart and tend to be educated for high-income occupations such as doctors and lawyers, while Black and African Americans may suffer from racial discrimination and are forced to work in low-income jobs.
 
-#### Age group
+### Age group
 
-```{r fig.align = 'center'}
-# install.packages("magick")
+```{r fig6, fig.align = 'center', fig.cap="Median weekly income by year and age group"}
 plot_theme <- theme_bw() +
   theme(
     panel.grid.major.x = element_blank(),
@@ -251,7 +265,7 @@ earn %>%
   ggplot(aes(x = age, y = mean)) +
   geom_col(aes(fill = age) ,position = "dodge", size = 1) +
   geom_text(aes(label = round(mean, 1)))+
-# coord_flip() +
+  scale_fill_brewer(palette="Dark2") +
   xlab("Year") +
   ylab("Mean of median weekly earn") +
   scale_fill_brewer(palette = 1) +
@@ -261,40 +275,16 @@ earn %>%
   transition_states(year)
 ```
 
-Based on the figure above, income levels at different age groups are shown. Here, the Y-axis is divided by the minimum, 1/4 quantile, median, 3/4 quantile and maximum income of the total. The plot interactively demonstrates that young adults earn much less than middle-aged people and there's not much difference in age groups over 35.
+Based on Figure \@ref(fig:fig6), income levels at different age groups are all growing over the years. The Y-axis is divided by the minimum, 1/4 quantile, median, 3/4 quantile and maximum income of the total median weekly income. The plot interactively demonstrates that young adults earn much less than middle-aged people and there's not much difference between age groups over 35.
 
-#### Ethnic Origin
 
-Since the data breaks out only for the ethnic origin of Hispanics or Latinos who are minorities in the United States, let's just plot their income and see if there's any difference.
-
-```{r fig.align = 'center', fig.cap = "Median weekly earn of Hispanics or Latinos"}
-earn %>%
-  filter(ethnic_origin != "All Origins",
-         sex == "Both Sexes",
-         race == "All Races",
-         age == "16 years and over") %>%
-  ggplot(aes(x = year, y = median_weekly_earn)) +
-  geom_boxplot() +
-  scale_y_continuous(name = "Median Weekly Earn", breaks = c(500,550,600,650,700,750,800)) +
-  xlab("") +
-  theme_bw() +
-  coord_flip() +
-  annotate("text", x = 5, y = 700, color = "black", label = "Total Median: 755") +
-  annotate("text", x = 4, y = 700, color = "black", label = "Total 1/4 Quantile: 605") +
-  annotate("text", x = 3, y = 700, color = "black", label = "Total Minimum: 318")
-
-```  
-   
-Compare to the median weekly income of total, the boxplot illustrates roughly low income for Hispanics or Latinos, even lower than the black or African American. The possible reasons for the circumstance can be related to education level, personal will, government support, employment discrimination, etc.
+## How significant is gender and race in affecting earnings?
 
 
 
+# Key Findings and Limitations - Rachel to edit
 
-# Conclusion - Rachel to edit
-
-Combining these two data analysis on the employment situation and income level in the United States, some preliminary conclusions can be drawn:  
-
-1. In terms of gender, industries that are overwhelmingly male generally require more physical labor and technical skills, while industries with more women generally require more patience and carefulness. On this basis, men generally earn more than women, which illustrates that a higher level of technology or professional skills may lead to higher income.   
+Based on the analysis above, it is obvious that gender, race and age group do play significant role in both employment and earning across industries in the US. Industries that generally require more physical labor and technical skills are overwhelmingly dominated by male, such as construction and transport, whereas industries with more women generally require more patience and carefulness, such as education and health. In terms of earnings, men generally earn more than women, which illustrates that a higher level of technology or professional skills may lead to higher income, and gender discrimination could be an issue in higher income groups and occupations.   
 
 2. In terms of race, the number of white people employed is much higher than that of other races. On the one hand, the white population base in the United States is much higher than that of Asians, and on the other hand, whites are not subject to racial discrimination while blacks or African Americans are often the first victims. However, from the income, we find that Asians earn the most. This is mainly due to the fact that Asian immigrants to the United States generally have high education and/or high technology, and generally have high economic strength and educational level, including overseas students. Thus, their income is relatively high. Blacks and Hispanics or Latinos earn less possibly because of employment discrimination or laziness.   
 
@@ -307,19 +297,19 @@ Combining these two data analysis on the employment situation and income level i
 
 Fekedulegn.D, Alterman.T, Charles.L, Kershaw.K, Safford.M, Howard.V, MacDonald.L (2019).Prevalence of workplace discrimination and mistreatment in a national sample of older U.S. workers: The REGARDS cohort study, *SSM - Population Health,* Volume 8, 100444, ISSN 2352-8273, https://doi.org/10.1016/j.ssmph.2019.100444.
 
-### Data source
+## Data source
 
 Labor Force Statistics from the Current Population Survey. (2021). Retrieved 15 August 2021, from https://www.bls.gov/cps/tables.htm#charemp_m
 
 Tidytuesday. (2021). Retrieved 15 August 2021, from https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md
 
 
-### Software
+## Software
 
 R Core Team (2020). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
 
 
-### Packages
+## Packages
 
 Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.5. https://CRAN.R-project.org/package=dplyr
 
