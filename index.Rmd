@@ -41,15 +41,16 @@ earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidyt
 
 # Introduction and motivation - Rachel to edit
 
-Gender and race have always been concerns in the workplace, which will be very helpful in looking through the fairness, equality and diversity. It raises our interest on exploring and conducting a detailed analysis in regards to the employment and earnings in different industries in the USA, using the data collected from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md).   
+Gender and race have always been widely discussed topics in various social domains, including employment and earning. Fekedulegn et al. (2019) suggested that workplace discrimination and mistreatment varied significantly by race and gender in the US, this statement raises the interest on exploring and conducting a detailed analysis in regards to the employment and earnings across different industries in the USA, using the data collected from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md). By looking through the employment status and earning from 2015 to 2020 across different race, gender as well as age groups in various industries in the US, the findings will assist with promoting fairness, equality and diversity in the workplace.
 
-However, due to the limitation of data including inadequate information about different regions and inconsistency of two datasets in terms of the time frame, the outcome of the analysis would be affected.
+Analysis conducted and conclusions drew in this report are solely based on the datasets described under Data description section, all records in the datasets are assumed to be accurate. Furthermore, due to the limitation of data including inadequate information about different regions and inconsistency of two datasets in terms of the time frame, the outcome of the analysis would be affected.
 
 # Data description - Sahinya to edit
 
 The datasets originally come from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m), specifically table *cpsaat17* across several years.  
 
 The **employed** dataset tells about employed persons by industry, sex, race, and occupation through 2015 to 2020.
+
 ```{r}
 employtable <- data_frame(Column_name = colnames(employed), 
                           data_type = sapply(employed, typeof),
@@ -59,6 +60,7 @@ kable(employtable) %>%
 ```
 
 The **earn** dataset tells about weekly median earnings and number of persons employed by race/gender/age group through 2010 to 2020.
+
 ```{r}
 earntable <-data_frame(Column_name = colnames(earn), 
                           data_type = sapply(earn, typeof),
@@ -66,6 +68,7 @@ earntable <-data_frame(Column_name = colnames(earn),
 kable(earntable) %>%
   kable_styling("striped", position = 'center')
 ```
+
 The datasets are collected from the Current Population Survey (CPS) which is a monthly survey of households conducted by the Bureau of Census for the Bureau of Labor Statistics.
 
 Here are some findings when looking through the methods used to tidy and wrangle data from the original source:  
@@ -84,7 +87,8 @@ Based on the datasets, three questions are going to be explored and analyzed in 
 - What are the demographic differences between industries from 2015 to 2020?
 
 - How do different factors affect the income between 2010 and 2020?
-  - how significant is gender, race and age group in affecting earnings (regression) - Rachel
+
+- how significant is gender, race and age group in affecting earnings (regression) - Rachel
   
 
 # Analysis and findings
@@ -300,6 +304,8 @@ Combining these two data analysis on the employment situation and income level i
 
 
 # References
+
+Fekedulegn.D, Alterman.T, Charles.L, Kershaw.K, Safford.M, Howard.V, MacDonald.L (2019).Prevalence of workplace discrimination and mistreatment in a national sample of older U.S. workers: The REGARDS cohort study, *SSM - Population Health,* Volume 8, 100444, ISSN 2352-8273, https://doi.org/10.1016/j.ssmph.2019.100444.
 
 ### Data source
 
