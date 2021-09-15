@@ -243,7 +243,7 @@ earn %>%
 
 ```
 
-Figure \@ref(fig:fig5) indicates that gender and race do play significant role in affecting weekly income through the past ten years. A clear upward trend in income can be observed in general over the period, the upper vertex of the segments represents male's income and the lower one represents female's, which clearly shows that men generally earn more than women in all years and races from 2010 to 2020. In addition, the plot suggests that race is also a key factor affecting income. **A surprising finding is that while the number of Asians employed are very low across all industries, Asians actually have the highest median weekly income among the three races recorded,** followed by the white race while the black or African American earns the least. This may reflect differences in the amount of time and energy that people of different races are willing to devote to their jobs, Asians are well-known for hard working and are more likely to work extra hours compare with the other two races. On the other hand, another possible reason is that there is a common belief that Asians are smart and tend to be educated for high-income occupations such as doctors and lawyers, while Black and African Americans may suffer from racial discrimination and are forced to work in low-income jobs.
+Figure \@ref(fig:fig5) indicates that gender and race do play significant role in affecting weekly income through the past ten years. A clear upward trend in income can be observed in general over the period, the upper vertex of the segments represents male's income and the lower one represents female's, which clearly shows that men generally earn more than women in all years and races from 2010 to 2020. In addition, the plot suggests that race is also a key factor affecting income. **A surprising finding is that while the number of Asians employed are very low across all industries as indicated in \@ref(3.2.2), Asians actually have the highest median weekly income among the three races recorded,** followed by the white race while the black or African American earns the least. This may reflect differences in the amount of time and energy that people of different races are willing to devote to their jobs, Asians are well-known for hard working and are more likely to work extra hours compare with the other two races. On the other hand, another possible reason is that there is a common belief that Asians are smart and tend to be educated for high-income occupations such as doctors and lawyers, while Black and African Americans may suffer from racial discrimination and are forced to work in low-income jobs.
 
 ### Age group
 
@@ -279,7 +279,7 @@ earn %>%
 Based on Figure \@ref(fig:fig6), income levels at different age groups are all growing over the years. The Y-axis is divided by the minimum, 1/4 quantile, median, 3/4 quantile and maximum income of the total median weekly income. The plot interactively demonstrates that young adults earn much less than middle-aged people and there's not much difference between age groups over 35. The finding is reasonable based on common sense, where people at age of 16-24 are most likely school leavers and full-time students who are working part-time, the income for this group are lower considering the number of hours they can work each week and the skill level of the occupations/positions they can get. 25-34 years old on the other hand, are more likely in the earlier stage of their career and working in entry level positions, the wages for these positions are generally higher but still not as high as senior positions, where majority of the age group 35 and over are working in.
 
 
-## How significant is gender and race in affecting earnings?
+## How significant are gender and race affecting earnings?
 
 Based on the findings above, it is clear that the median weekly income varies across gender and race, this section focus on exploring how significant each of them is in affecting earnings, and which one of them plays the most important role in median weekly income in the US.
 
@@ -294,11 +294,21 @@ reg <- earn %>%
   mutate(year = as.character(year))
 ```
 
-Before fitting a model to the data, an important factor to be considered is that **the earning data is time series data**, median weekly incomes naturally grow across all variables of interests over the years, assumption of independence and randomness is violated in this case. The best possible solution under this circumstances is to consider year as an additional categorical variable and include it in the model.
 
-```{r}
-ggpairs(reg)
+```{r fig7, fig.cap="Distribution of median weekly income by gender and race"}
+ggplot(reg, aes(race, median_weekly_earn)) + 
+  geom_violin(aes(fill = sex),
+              draw_quantiles = c(0.25, 0.5, 0.75)) +
+  geom_boxplot(width = 0.15) +
+  labs(x = "Race", 
+       y = "Meidan Weekly Income",
+       fill = "Gender") +
+  theme_bw() +
+  scale_fill_discrete_qualitative()
 ```
+Figure \@ref(fig:fig7) compares the distribution of median weekly income of male and female together with the overall distribution (the boxes without colour), it is obvious that women has lower median weekly income than not only male, but also the overall level in all three races. In addition, it confirms the findings from \@ref(3.4.1) that Asian has the highest median weekly income whereas the lowest is observed in Black or African American. Furthermore, the spread of distribution is wider for male compare with female, which suggests the differences between high and low median weekly income is larger among men. The findings again, confirmed that both gender and race are significant factors in terms of earning, however, it is hard to suggest how much they are affecting the median weekly income, or which one is more significant than the other.
+
+A model is then introduced, however, before fitting a model to the data, an important factor to be considered is that **the earning data is time series data**, median weekly income naturally grows across all variables of interests over the years, assumption of independence and randomness is violated in this case. The best possible solution under this circumstances is to consider year as an additional categorical variable and include it in the model.
 
 ```{r reg}
 model <- lm(median_weekly_earn ~ sex + race + year,
@@ -316,7 +326,7 @@ summary(model) %>%
 Table \@ref(tab:reg)
 
 ```{r}
-resid_panel(model, plots = "default")
+resid_panel(model, plots = "SAS")
 ```
 ```{r fit}
 glance(model)%>% 
