@@ -33,6 +33,7 @@ library(plotly)
 library(magick)
 library(ggResidpanel)
 library(broom)
+library(colorspace)
 ```
 
 
@@ -46,7 +47,7 @@ earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidyt
 
 # Introduction and Motivation - Rachel to edit
 
-Gender and race have always been widely discussed topics in various social domains, including employment and earning. Fekedulegn et al. (2019) suggested that workplace discrimination and mistreatment varied significantly by race and gender in the US, this statement raises the interest on exploring and conducting a detailed analysis in regards to the employment and earnings across different industries in the USA, to find out if this statement is true and how significant gender and race are in affecting employment and earning.
+Employment and earning is one of the most frequently discussed topics of all time, gender and race are often brought up in terms of fairness in workplace. Fekedulegn et al. (2019) suggested that workplace discrimination and mistreatment varied significantly by race and gender in the US, this statement raises the interest on exploring and conducting a detailed analysis in regards to the employment and earnings across different industries in the USA, and to find out if this statement is true and how significant gender and race are affecting employment and earning.
 
 The data used in this report is collected from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md), by looking through the employment status and earning from 2010 to 2020 across different races, genders as well as age groups in various industries in the US, the findings will assist with promoting fairness, equality and diversity in the workplace.
 
@@ -351,13 +352,9 @@ Based on the findings above, race, specifically Black or African American has si
 
 # Key Findings and Limitations - Rachel to edit
 
-Based on the analysis above, it is obvious that gender, race and age group do play significant role in both employment and earning across industries in the US. Industries that generally require more physical labor and technical skills are overwhelmingly dominated by male, such as construction and transport, whereas industries with more women generally require more patience and carefulness, such as education and health. In terms of earnings, men generally earn more than women, which illustrates that a higher level of technology or professional skills may lead to higher income, and gender discrimination could be an issue in higher income groups and occupations.   
+Industries that generally require more physical labor and technical skills are overwhelmingly dominated by male, whereas industries with more women generally require more patience and carefulness. In terms of earnings, men generally earn more than women, and younger age groups also turns to earn less compare with those who are 35 years old and over. An interesting findings is discovered in exploring the race factor, although Asians occupy a very low proportion in number of people employed, they have higher median weekly income than White people, which have significantly higher number of people employed across industries. Black or African Americans are earning the least and with very low number of people employed across industries. The regression model also supports these findings and demonstrates that Black or African American is the most significant variable result in earning lower median weekly income, followed by being a women and White. Based on the findings, it is proved that gender and race do play significant role in both employment and earning across industries in the US, discrimination and mistreatment in the workforce could be an concerning issue in the US.
 
-2. In terms of race, the number of white people employed is much higher than that of other races. On the one hand, the white population base in the United States is much higher than that of Asians, and on the other hand, whites are not subject to racial discrimination while blacks or African Americans are often the first victims. However, from the income, we find that Asians earn the most. This is mainly due to the fact that Asian immigrants to the United States generally have high education and/or high technology, and generally have high economic strength and educational level, including overseas students. Thus, their income is relatively high. Blacks and Hispanics or Latinos earn less possibly because of employment discrimination or laziness.   
-
-3. In terms of age groups, middle aged people earn most, a lot higher than young adults, which is rather reasonable. This indicates that the United States attaches great importance to work experience and has a relatively stable prospect of promotion and salary increase, which to some extent reflects the sound and stable corporate policy and roughly perfect social welfare system in the United States.   
-
-4. The decline in U.S. employment from 2019 to 2020 is likely due to an increase in layoffs during the economic depression. (Possibly affected by COVID-19)  
+In terms of limitations, the period of records in the two datasets used are different, employment dataset is recorded from 2015 to 2020 whereas earning contains data from 2010 to 2020, the inadequateness could lead to biased findings and conclusions. Age group and ethnic origins could also be considered with additional datasets from different data sources with a longer time line in future studies, in order to draw more precise conclusions.
 
 
 # References
@@ -401,3 +398,5 @@ Wilke, C.O. (2020). ggtext: Improved Text Rendering Support for 'ggplot2'. R pac
 Yihui Xie and J.J. Allaire and Garrett Grolemund (2018). R Markdown: The Definitive Guide. Chapman and Hall/CRC. ISBN 9781138359338. URL https://bookdown.org/yihui/rmarkdown.
 
 Yihui Xie and Christophe Dervieux and Emily Riederer (2020). R Markdown Cookbook. Chapman and Hall/CRC. ISBN 9780367563837. URL https://bookdown.org/yihui/rmarkdown-cookbook.
+
+Zeileis A, Hornik K, Murrell P (2009). “Escaping RGBland: Selecting Colors for Statistical Graphics.” Computational Statistics \& Data Analysis, *53*(9), 3259-3270. doi: 10.1016/j.csda.2008.11.033 (URL: https://doi.org/10.1016/j.csda.2008.11.033)
