@@ -53,7 +53,7 @@ The data used in this report is collected from [tidytuesday](https://github.com/
 
 Analysis conducted and conclusions drew in this report are solely based on the datasets described under Data Description section, all records in the datasets are assumed to be accurate. Furthermore, due to the inadequate information in regions and inconsistency of time frame in the two datasets used in this report, the findings could be subject to potential bias.
 
-# Data Description - Sahinya to edit
+# Data Description
 
 The datasets originally come from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m), specifically table *cpsaat17* across several years.  
 
