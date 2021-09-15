@@ -31,6 +31,8 @@ library(tidyverse)
 library(hrbrthemes)
 library(plotly)
 library(magick)
+library(ggResidpanel)
+library(broom)
 ```
 
 
@@ -264,8 +266,7 @@ earn %>%
   summarise(mean = mean(median_weekly_earn)) %>%
   ggplot(aes(x = age, y = mean)) +
   geom_col(aes(fill = age) ,position = "dodge", size = 1) +
-  geom_text(aes(label = round(mean, 1)))+
-  scale_fill_brewer(palette="Dark2") +
+  geom_text(aes(label = round(mean, 1))) +
   xlab("Year") +
   ylab("Mean of median weekly earn") +
   scale_fill_brewer(palette = 1) +
@@ -275,10 +276,57 @@ earn %>%
   transition_states(year)
 ```
 
-Based on Figure \@ref(fig:fig6), income levels at different age groups are all growing over the years. The Y-axis is divided by the minimum, 1/4 quantile, median, 3/4 quantile and maximum income of the total median weekly income. The plot interactively demonstrates that young adults earn much less than middle-aged people and there's not much difference between age groups over 35.
+Based on Figure \@ref(fig:fig6), income levels at different age groups are all growing over the years. The Y-axis is divided by the minimum, 1/4 quantile, median, 3/4 quantile and maximum income of the total median weekly income. The plot interactively demonstrates that young adults earn much less than middle-aged people and there's not much difference between age groups over 35. The finding is reasonable based on common sense, where people at age of 16-24 are most likely school leavers and full-time students who are working part-time, the income for this group are lower considering the number of hours they can work each week and the skill level of the occupations/positions they can get. 25-34 years old on the other hand, are more likely in the earlier stage of their career and working in entry level positions, the wages for these positions are generally higher but still not as high as senior positions, where majority of the age group 35 and over are working in.
 
 
 ## How significant is gender and race in affecting earnings?
+
+Based on the findings above, it is clear that the median weekly income varies across gender and race, this section focus on exploring how significant each of them is in affecting earnings, and which one of them plays the most important role in median weekly income in the US.
+
+```{r}
+reg <- earn %>% 
+  select(sex,
+         race,
+         year,
+         median_weekly_earn) %>% 
+  filter(!sex == "Both Sexes",
+         !race == "All Races") %>% 
+  mutate(year = as.character(year))
+```
+
+Before fitting a model to the data, an important factor to be considered is that **the earning data is time series data**, median weekly incomes naturally grow across all variables of interests over the years, assumption of independence and randomness is violated in this case. The best possible solution under this circumstances is to consider year as an additional categorical variable and include it in the model.
+
+```{r}
+ggpairs(reg)
+```
+
+```{r reg}
+model <- lm(median_weekly_earn ~ sex + race + year,
+            data = reg)
+
+summary(model) %>% 
+  tidy()%>%
+  kable(align = "c",
+        digits = 4,
+        caption = "Regression model fitted to median weekly income by gener, race and year") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  scroll_box(width = "100%", height = "300px")
+```
+
+Table \@ref(tab:reg)
+
+```{r}
+resid_panel(model, plots = "default")
+```
+```{r fit}
+glance(model)%>% 
+  select(r.squared,adj.r.squared, AIC, BIC) %>% 
+  kable(align = "c",
+        digits = 4,
+        caption = "Goodness of fit") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+Table \@ref(tab:fit)
 
 
 
@@ -311,14 +359,20 @@ R Core Team (2020). R: A language and environment for statistical computing. R F
 
 ## Packages
 
+David Robinson, Alex Hayes and Simon Couch (2021). broom: Convert Statistical Objects into Tidy Tibbles. R package version 0.7.9. https://CRAN.R-project.org/package=broom
+
 Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.5. https://CRAN.R-project.org/package=dplyr
 
 Hadley Wickham (2021). tidyr: Tidy Messy Data. R package version 1.1.3.https://CRAN.R-project.org/package=tidyr
 
 Hao Zhu (2021). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R package version 1.3.4. https://CRAN.R-project.org/package=kableExtra
 
+Jeroen Ooms (2021). magick: Advanced Graphics and Image-Processing in R. R package version 2.7.3. https://CRAN.R-project.org/package=magick
+
 JJ Allaire and Yihui Xie and Jonathan McPherson and Javier Luraschi and Kevin Ushey and Aron Atkins and Hadley Wickham and Joe Cheng and Winston Chang and Richard Iannone (2021). rmarkdown: Dynamic Documents for R. R package version 2.10. URL https://rmarkdown.rstudio.com.
 
+Katherine Goode and Kathleen Rey (2019). ggResidpanel: Panels and Interactive Versions of Diagnostic Plots using 'ggplot2'. R package version 0.3.0. https://CRAN.R-project.org/package=ggResidpanel
+  
 Kirill Müller and Hadley Wickham (2021). tibble: Simple Data Frames. R package version 3.1.3. https://CRAN.R-project.org/package=tibble
 
 Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686
