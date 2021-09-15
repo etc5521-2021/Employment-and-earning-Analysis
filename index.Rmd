@@ -25,6 +25,9 @@ library(ggstream)
 library(gganimate)
 library(plotly)
 library(kableExtra)
+library(tidyverse)
+library(hrbrthemes)
+library(plotly)
 ```
 
 
@@ -48,35 +51,18 @@ The datasets originally come from [BLS](https://www.bls.gov/cps/tables.htm#chare
 
 The **employed** dataset tells about employed persons by industry, sex, race, and occupation through 2015 to 2020.
 ```{r}
-employtable <- tribble(
-  ~Variable, ~Type,
-  "industry", "character",
-  "major_occupation", "character",
-  "minor_occupation", "character",
-  "race_gender", "character",
-  "industry_total", "double",
-  "employ_n", "double",
-  "year", "integer"
-) %>%
-  as.data.frame()
+employtable <- data_frame(Column_name = colnames(employed), 
+                          data_type = sapply(employed, typeof),
+                          description = c("Industry Group", "Major occupation category", "Minor occupation category", "Race & Gender wise information", "Industry total count", "Number of people employed", "Year")) 
 kable(employtable) %>%
   kable_styling("striped", position = 'center')
 ```
 
 The **earn** dataset tells about weekly median earnings and number of persons employed by race/gender/age group through 2010 to 2020.
 ```{r}
-earntable <- tribble(
-  ~Variable, ~Type,
-  "sex", "character",
-  "race", "character",
-  "ethnic_origin", "character",
-  "age", "character",
-  "year", "integer",
-  "quarter", "integer",
-  "n_persons", "double",
-  "median_weekly_income", "integer"
-) %>%
-  as.data.frame()
+earntable <-data_frame(Column_name = colnames(earn), 
+                          data_type = sapply(earn, typeof),
+                          description = c("Gender", "Racial group", "Ethnic origin (hispanic or non-hispanic)", "Age group", "Year", "Quarter", "Number of persons employed by group", "Median weekly earning in current dollars")) 
 kable(earntable) %>%
   kable_styling("striped", position = 'center')
 ```
@@ -105,7 +91,9 @@ Based on the datasets, three questions are going to be explored and analyzed in 
 
 ### What are the changes of people employed in different industries from 2015 to 2020? - Sahinya to edit
 
-```{r}
+```{r, fig.width=10, fig.height=8, fig.align='center'}
+
+options(scipen=1000)
 industry <- employed %>%
   filter(race_gender == 'TOTAL',
          !is.na(industry),
@@ -113,22 +101,16 @@ industry <- employed %>%
   select(industry, industry_total,year) %>%
   rename(no_of_people_employed = `industry_total`) %>%
   group_by(year) %>%
-  unique()
-  
+  unique() %>%
+  arrange(industry) %>%
+  mutate(industry = factor(industry, industry), text = paste0("Year: ", year, "\n", "Industry: ", industry, "\n", "Total Employed: ", no_of_people_employed))
+
+ggplot(industry, aes(year, industry, fill= no_of_people_employed, text = text)) + 
+  geom_tile(size=1, colour = "white") +
+  theme_ipsum()
+
 ```
 
-```{r fig.align = 'center', fig.cap= "Total number of people employed in industries"}
-employed_in_each_industry <- industry %>%
-  ggplot(aes(x=year, y =no_of_people_employed, color=industry)) +
-  geom_line()+
-  labs(
-    color = "industry",
-    x = "",
-    y = "The number of people employed") +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = "0.5", size = 15))
-ggplotly(employed_in_each_industry)
-```
 First of all, the graph shown above indicates the changes of all the population of employees from different industries in recent 5 years. To be more specific, there is a large number of people working in the industry of education and health services, and the population stayed stably between 34 million and 35 million during 2015 to 2020. However, as the industry of private households hold the least population, the number of people employed in this industry actually decreased from around 0.7 million to 0.6 million. In addition, all industries experienced the decrease of people employed within the industries from 2019 to 2020 except for the public administration. 
 
 
@@ -136,42 +118,24 @@ First of all, the graph shown above indicates the changes of all the population 
 
 #### Gender
 
-```{r}
-industry <- employed %>%
-  filter(race_gender == 'TOTAL',
-         !is.na(industry),
-         !is.na(industry_total)) %>%
-  select(industry, industry_total,year) %>%
-  rename(no_of_people_employed = `industry_total`) %>%
-  group_by(year) %>%
-  unique()
-  
-```
-
-```{r}
+```{r, fig.width=10, fig.height=8, fig.align='center'}
 Gender <- employed %>%
   filter(race_gender %in% c('Men','Women'),
          !is.na(industry),
          !is.na(industry_total)) %>%
   select(industry, race_gender,industry_total,year) %>%
   rename(Gender = race_gender) %>%
-  unique()
-```
+  unique() %>% 
+  arrange(year, industry, Gender)
 
-```{r fig.height=20, fig.width=10, fig.align = 'center', fig.cap = "The differences between male and female employed in industries between 2015 and 2020"}
-Gender_all <-Gender %>%
-  ggplot(aes(x = year, y = industry_total, fill = Gender)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  theme_bw()+
-  facet_wrap(~industry)+
-  labs(
-    color = "Gender",
-    x = "",
-    y = "The number of people employed") +
-  theme_bw() +
-  theme_bw(base_size = 10) +
-  theme(plot.title = element_text(hjust = "0.5", size = 15))
-ggplotly(Gender_all)
+p <- Gender %>% ggplot(aes(x = industry, y = industry_total, fill = industry)) +
+  geom_col() +
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90), legend.position="none") +
+  facet_grid(year ~ Gender)
+
+plotly::ggplotly(p)
+
 ```
 
 In the analysis about genders in different industries, it is found that there are only five industries that have more female employees than male, which are education and health services, financial activities, leisure and hospitality, other services and private households. Especially in the industry of education and services, the number of female employees is more than twice as much as the number of male employees. On the contrary, male workers occupy most of the roles in some industries like manufacturing, construction, transportation and utilities and durable goods. More than 90% of the employees are male in the industry of construction.
@@ -179,34 +143,42 @@ In the analysis about genders in different industries, it is found that there ar
 
 #### Race
 
-```{r}
+```{r, fig.width=12, fig.height=8, fig.align='left'}
 Race <- employed %>%
   filter(race_gender %in% c('White','Black or African American', 'Asian'),
          !is.na(industry),
          !is.na(industry_total)) %>%
   select(industry, race_gender,industry_total,year)%>%
   rename(Race = race_gender) %>%
-  unique()
+  unique()%>% 
+  arrange(year, industry, Race)
 
-```
+p <- Race %>% ggplot(aes(x = industry, y = industry_total, fill = industry)) +
+  geom_col() +
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90), legend.position="none") +
+  facet_grid(year ~ Race)
 
-```{r fig.height=20, fig.width=9, fig.align = 'center', fig.cap = "The changes of total number of people employed in terms of race from 2015 to 2020"}
-Race_all <- Race %>%
-  ggplot(aes(x = year, y = industry_total, color=Race)) +
-  geom_line() +
-  facet_wrap(~industry, scales = "free_y", ncol = 4) +
-  labs(
-    color = "Race",
-    x = "",
-    y = "The number of people employed") +
-  theme_bw() +
-  theme_bw(base_size = 10) +
-  theme(plot.title = element_text(hjust = "0.5", size = 15)) +
-  theme(axis.text.y = element_text(angle = 55, hjust = 10, vjust = 20)) + 
-  theme(legend.position = "none")
-ggplotly(Race_all)
+plotly::ggplotly(p)
+
 ```
 When looking at the relationships between industries and the population employed among races from the data, most of the people employed among all the industries are white people, following by Black or African American and Asian. 
+
+### At what age do men and women work the most and how does the age factor contribute towards employement? - Sahinya
+
+```{r}
+total <- sum(earn$n_persons)
+earn %>% 
+  filter(sex %in% c("Men", "Women")) %>% 
+  group_by(sex, age) %>% 
+  summarise(percent = 100 * sum(n_persons)/total) %>% 
+  ggplot(aes(x = age, y = percent, fill = sex)) + 
+  geom_col(position = "dodge") +
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+It can be observed from the figure that both men and women in between the age 16 to 54 have been employed more when compared to other age groups. It is also evident that the number of male employees are more when compared to women. There is a peak in 25-54 age group as this is the age when people finish education and start their career. This also happens to be the prime working time in most of their lives. As one intends the curve to be, there is a peak and the 25-54 age group and the numbers slowly go down after 55 years as people start their retirement phase.  
 
 ### How do different factors affect the income between 2010 and 2020? - Rachel to edit
 
@@ -264,6 +236,7 @@ plot_theme <- theme_bw() +
     panel.grid.minor.y = element_blank(),
     axis.text.x = element_blank()
   )
+
 earn %>%
   filter(age %in% c("16 to 24 years", "25 to 34 years", "35 to 44 years", "45 to 54 years", "55 years and over"),
          sex == "Both Sexes",
