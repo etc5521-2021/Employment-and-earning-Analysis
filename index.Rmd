@@ -40,6 +40,8 @@ library(colorspace)
 ```{r}
 employed <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-23/employed.csv')
 
+employed <- employed %>% mutate(industry = ifelse(industry == "Mining, quarrying, and\r\noil and gas extraction", "Mining, quarrying, and oil and gas extraction", industry))
+
 earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-23/earn.csv')
 ```
 
@@ -123,13 +125,14 @@ industry <- employed %>%
   arrange(industry) %>%
   mutate(industry = factor(industry, industry), text = paste0("Year: ", year, "\n", "Industry: ", industry, "\n", "Total Employed: ", `Number of people employed`))
 
-ggplot(industry, aes(year, industry, fill= `Number of people employed`, text = text)) + 
+p <- ggplot(industry, aes(year, industry, fill= `Number of people employed`)) + 
   geom_tile(size=1, colour = "white") +
   theme_ipsum()
 
+plotly::ggplotly(p)
 ```
 
-First of all, Figure \@ref(fig:fig1) shown above indicates the changes of all the population of employees from different industries in recent 5 years. To be more specific, there is a large number of people working in the industry of education and health services, and the population stayed stably between 34 million and 35 million during 2015 to 2020. However, as the industry of private households hold the least population, the number of people employed in this industry actually decreased from around 0.7 million to 0.6 million. In addition, all industries experienced the decrease of people employed within the industries from 2019 to 2020 except for the public administration. 
+Figure \@ref(fig:fig1) shown above indicates the changes of all the population of employees from different industries in recent 5 years. To be more specific, there is a large number of people working in the industry of education and health services, and the population stayed stably between 34 million and 35 million during 2015 to 2020. However, as the industry of private households hold the least population, the number of people employed in this industry actually decreased from around 0.7 million to 0.6 million. In addition, all industries experienced the decrease of people employed within the industries from 2019 to 2020 except for the public administration. 
 
 
 ## What are the demographic differences between industries from 2015 to 2020? - Sahinya to edit
@@ -146,13 +149,13 @@ Gender <- employed %>%
   unique() %>% 
   arrange(year, industry, Gender)
 
-p <- Gender %>% ggplot(aes(x = industry, y = industry_total, fill = industry)) +
-  geom_col() +
+p <- Gender %>% ggplot(aes(x = industry, y = industry_total, fill = Gender)) +
+  geom_col(position = "dodge") +
   theme_bw() +
   labs(x = "",
        y = "") +
-  theme(axis.text.x = element_text(angle = 90), legend.position="none") +
-  facet_grid(year ~ Gender)
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_wrap(~ year)
 
 plotly::ggplotly(p)
 
@@ -173,13 +176,13 @@ Race <- employed %>%
   unique()%>% 
   arrange(year, industry, Race)
 
-p <- Race %>% ggplot(aes(x = industry, y = industry_total, fill = industry)) +
-  geom_col() +
+p <- Race %>% ggplot(aes(x = industry, y = industry_total, fill = Race)) +
+  geom_col(position = "dodge") +
   theme_bw() + 
   labs(x = "",
        y = "") +
-  theme(axis.text.x = element_text(angle = 90), legend.position="none") +
-  facet_grid(year ~ Race)
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_wrap(~ year)
 
 plotly::ggplotly(p)
 
@@ -201,7 +204,22 @@ earn %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-It can be observed from Figure \@ref(fig:fig4) that both men and women in between the age 16 to 54 have been employed more when compared to other age groups. It is also evident that the number of male employees are more when compared to women. There is a peak in 25-54 age group as this is the age when people finish education and start their career. This also happens to be the prime working time in most of their lives. As one intends the curve to be, there is a peak and the 25-54 age group and the numbers slowly go down after 55 years as people start their retirement phase.  
+It can be observed from Figure \@ref(fig:fig4) that both men and women in between the age 16 to 54 have been employed more when compared to other age groups. It is also evident that the number of male employees are more when compared to women. There is a peak in 25-54 age group as this is the age when people finish education and start their career. This also happens to be the prime working time in most of their lives. As one intends the curve to be, there is a peak and the 25-54 age group and the numbers slowly go down after 55 years as people start their retirement phase. It can be observed that there is approximately 20% difference in between the men and women working population.
+
+```{r women-race, fig.cap="Employment rate by gender and age group"}
+earn %>% 
+  filter(sex == "Women" & race != "All Races") %>% 
+  group_by(race, year) %>% 
+  summarise(total = sum(n_persons)) %>% 
+  ggplot(aes(x = year, y = total, color = race)) + 
+  geom_line() +
+  scale_x_continuous(breaks = seq(2010, 2020, by = 2)) + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+In \@ref(fig:women-race), it is observed that most of the working women population are white. This could be due to workplace politics where women of color are treated unfairly. However, we can notice a betterment in the situation of the Asian and the African American population in the year 2019. There is also a question as to if the data is representing the working population only in the US or the whole wide world. 
+
+Racism and sexism still persists in and around us. From an economic perspective, reducing gender gaps and avoiding racism can lead to increased GDP. Women are pushed away from taking up paid jobs due to the stereotypical nature of many companies/people. However, there is hope and due to the modernisation, there will be better opportunities for women.  
 
 ## How do different factors affect the income between 2010 and 2020? - Rachel to edit
 
