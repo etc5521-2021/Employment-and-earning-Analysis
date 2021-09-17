@@ -51,17 +51,17 @@ earn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidyt
 
 # Introduction and Motivation
 
-Employment and earning is one of the most frequently discussed topics of all time, age, gender and race are often brought up in terms of fairness in workplace. Fekedulegn et al. (2019) suggested that workplace discrimination and mistreatment varied significantly by race and gender in the US, this statement raises the interest on exploring and conducting a detailed analysis in regards to the employment and earnings across different industries in the USA, and to find out if this statement is true and how significant gender and race are affecting employment and earning.
+Employment and earning is one of the most frequently discussed topics of all time, age, gender and race are often brought up in terms of fairness in workplace. Fekedulegn et al. (2019) suggested that workplace discrimination and mistreatment varied significantly by race and gender in the US, this statement raises the interest in exploring and conducting detailed analysis in regards to the employment and earnings across different industries in the USA, and to find out if this statement is true and how significant gender and race are affecting employment and earning.
 
-The data used in this report is collected from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md), by looking through the employment status and earning from 2010 to 2020 across different races, genders as well as age groups in various industries in the US, the findings will assist with promoting fairness, equality and diversity in the workplace.
+The data used in this report is collected from [tidytuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-02-23/readme.md), by looking through the employment status and earnings from 2010 to 2020 across different races, genders as well as age groups in various industries in the US, the findings will assist with promoting fairness, equality and diversity in the workplace.
 
-Analysis conducted and conclusions drew in this report are solely based on the datasets described under Data Description section, all records in the datasets are assumed to be accurate. Furthermore, due to the inadequate information in regions and inconsistency of time frame in the two datasets used in this report, the findings could be subject to potential bias.
+Analysis conducted and conclusions drew in this report are solely based on the datasets described under Data Description section, all records in the datasets are assumed to be accurate. Furthermore, due to the inadequate information in regions and inconsistency of the time frame in the two datasets used in this report, the findings could be subject to potential bias.
 
 # Data Description
 
 The datasets originally come from [BLS](https://www.bls.gov/cps/tables.htm#charemp_m), specifically table *cpsaat17* across several years.  
 
-The **employed** dataset tells about employed persons by industry, sex, race, and occupation through 2015 to 2020.
+The **employed** dataset contains details reagarding employed persons by industry, gender, race, and occupation through 2015 to 2020.
 
 ```{r}
 employtable <- data_frame(Column_name = colnames(employed), 
@@ -73,7 +73,7 @@ kable(employtable,
   kable_styling("striped", position = 'center')
 ```
 
-The **earn** dataset tells about weekly median earnings and number of persons employed by race/gender/age group through 2010 to 2020.
+The **earn** dataset includes weekly median earnings and number of persons employed by race/gender/age group through 2010 to 2020.
 
 ```{r}
 earntable <-data_frame(Column_name = colnames(earn), 
@@ -93,16 +93,15 @@ Here are some findings when looking through the methods used to tidy and wrangle
 The raw data is in excel format. The author of tidytuesday firstly took one year in the data as an example to clean, using `slice()`, `rename()` etc functions to display the titles and data itself of the original table clearly and properly. Then, in order to have each variable corresponding to one column, `pivot_longer()` was used. After that, the author got rid of those redundant characters by `regexp` and selected the required data. With these steps, it is about to finish cleaning the data for a given year. What to do next is to create a function referring to the steps above and apply the function to combine all years. Yet, it's necessary to have the tidy data checked by simply making a plot using `ggplot2` function. Finally, the data can be output by `write_csv()`.  
 
 - earn data  
-The raw data is in excel format. The author changed it to a table format using `html_nodes()` and `html_table()`. Similarly as in the employed data, a function was created and data was combined together with the functions `bind_rows()` and `left_join()`. Then, with similar steps,the final cleaned data can be acquired through basic tidy methods like `filter()`, `select()`, `mutate()` etc. Last but not the least, the data can be checked and output.
+The raw data is in excel format. The author changed it to a table format using `html_nodes()` and `html_table()`. Similarly, as in the employed data, a function was created and data were combined together with the functions `bind_rows()` and `left_join()`. Then, with similar steps, the final cleaned data can be acquired through basic tidy methods like `filter()`, `select()`, `mutate()` etc. Last but not the least, the data can be checked and output.
 
-
-Based on the datasets, five questions are going to be explored and analyzed in the following section, including:
+Based on the datasets, five questions are going to be explored and analysed in the following section:
 
 - What are the changes of people employed in different industries from 2015 to 2020?
  
 - What are the demographic differences between industries from 2015 to 2020?
 
-- How gender and race affecting employment rate within age groups?
+- Are gender and race affecting employment rate within age groups?
 
 - How do different factors affect the income between 2010 and 2020?
 
@@ -113,7 +112,7 @@ Based on the datasets, five questions are going to be explored and analyzed in t
 
 ## What are the changes of people employed in different industries from 2015 to 2020?
 
-```{r fig1, message=FALSE, warning=FALSE, fig.width=15, fig.height=8, fig.align='center', fig.cap="Number of people employed across industry from 2015 to 2020"}
+```{r fig1, message=FALSE, warning=FALSE, fig.width=10, fig.height=7, fig.cap="Number of people employed across industry from 2015 to 2020"}
 industry <- employed %>%
   filter(race_gender == 'TOTAL',
          !is.na(industry),
@@ -136,16 +135,15 @@ ggplotly(employed_in_each_industry)
 
 ```
 
-Figure \@ref(fig:fig1) above indicates the changes of number of people employed in different industries from 2015 to 2020. It is obvious that the highest number of people were employed in the industry of education and health services, between 34 and 35 millions, followed by wholesale and retail trade, and professional and business services. The number of people employed are the lowest in private households and mining, quarrying and oil and gas extraction with less than one million people employed. 
+Figure \@ref(fig:fig1) above indicates the changes in the number of people employed in different industries from 2015 to 2020. It is obvious that the highest number of people were employed in the industry of education and health services, between 34 and 35 million, followed by wholesale and retail trade, and professional and business services. The number of people employed is the lowest in private households and mining, quarrying and oil and gas extraction with less than one million people employed. 
 
-The number of people employed were relatively steady across all industries from 2015 to 2018, however, COVID-19 pandemic attacked the US in early 2019, a decrease in number of people employed can be observed in multiple industries especially leisure and hospitality, it is one of the most affected industries by the travel restrictions and closed boarders, which leads to higher job loses and hence a drop in number of employees in the industry. **An interesting findings is that, while the other industries experienced a decrease in number of people employed, a slight increase is observed from public administration from 7.2 millions in 2019 to 7.5 millions in 2020.** Public administration involves jobs and tasks associated with implementation of government policies, the nature of the industry explains the slight increase, as these positions became particularly important and in demand during the pandemic.
-
+The number of people employed was relatively steady across all industries from 2015 to 2018, however, the COVID-19 pandemic attacked the US in early 2019, a decrease in the number of people employed can be observed in multiple industries especially leisure and hospitality, it is one of the most affected industries by the travel restrictions and closed borders, which leads to higher job loses and hence a drop in the number of employees in the industry. **An interesting findings is that, while the other industries experienced a decrease in the number of people employed, a slight increase is observed from public administration from 7.2 million in 2019 to 7.5 million in 2020.** Public administration involves jobs and tasks associated with the implementation of government policies, the nature of the industry explains the slight increase, as these positions became particularly important and in-demand during the pandemic.
 
 ## What are the demographic differences between industries from 2015 to 2020?
 
 ### Gender
 
-```{r fig2, fig.width=10, fig.height=8, fig.align='center', fig.cap="Distribution of men and women across industries"}
+```{r fig2, fig.width=10, fig.height=8, fig.cap="Distribution of men and women across industries"}
 Gender <- employed %>%
   filter(race_gender %in% c('Men','Women'),
          !is.na(industry),
@@ -171,7 +169,7 @@ In the analysis about genders in different industries, it is found that males do
 
 ### Race
 
-```{r fig3, fig.width=12, fig.height=8, fig.align='left', fig.cap="Distribution of different races across industries"}
+```{r fig3, fig.width=12, fig.height=8, fig.cap="Distribution of different races across industries"}
 Race <- employed %>%
   filter(race_gender %in% c('White','Black or African American', 'Asian'),
          !is.na(industry),
@@ -193,10 +191,10 @@ plotly::ggplotly(p)
 
 ```
 
-According to Figure \@ref(fig:fig3), when looking at the distribution of races across industries in the US, most of the people employed among all the industries are white people, following by Black or African American and Asian. **The number of people employed who are white is significantly higher than both African American and Asian combined in all industries, although it may align with the distribution of races in total population, the large gap is still concerning and it may suggests possible discrimination in the workforce.**
+According to Figure \@ref(fig:fig3), when looking at the distribution of races across industries in the US, most of the people employed among all the industries are white people, following by Black or African American and Asian. **The number of people employed who are white is significantly higher than both African American and Asian combined in all industries, although it may align with the distribution of races in total population, the large gap is still concerning and may suggest possible discrimination in the workforce.**
 
 
-## How gender and race affecting employment rate within age groups?
+## Are gender and race affecting employment rate within age groups?
 
 ```{r fig4, fig.cap="Employment rate by gender and age group"}
 total <- earn %>% 
@@ -229,7 +227,7 @@ fig4 <- earn %>%
 ggplotly(fig4)
 ```
 
-It can be observed from Figure \@ref(fig:fig4) that the percentage of male that actively working and earning is about 2% higher than female across all age groups, which also raise the concern of gender equality and discrimination in employment. The proportion of people in 25-54 age group is slightly higher than the other age groups except 55 years and over, it is reasonable as people in this age group are expected to finish education and start their career. **A surprising finding is that people aged 55 years and over occupy the highest proportion (around 30%) of the total working population, it is in contrary to the common belief that people are most likely retired at this age.** It could be explained by the aging population, or high demand of experienced professionals at older ages, However, it could also be caused by the biased samples collected in the dataset, which requires further researches with additional datasets for cross checking. 
+It can be observed from Figure \@ref(fig:fig4) that the percentage of male that actively working and earning is about 2% higher than female across all age groups, which also raise the concern of gender equality and discrimination in employment. The proportion of people in the 25-54 age group is slightly higher than the other age groups except for 55 years and over, it is reasonable as people in this age group are expected to finish education and start their career. **A surprising finding is that people aged 55 years and over occupy the highest proportion (around 30%) of the total working population, it is contrary to the common belief that people are most likely retired at this age.** It could be explained by the ageing population, or the high demand for experienced professionals at older ages, However, it could also be caused by the biased samples collected in the dataset, which requires further researches with additional datasets for cross-checking. 
 
 ```{r women-race, fig.cap="Employment rate by gender and race within each age group"}
 race_tt <- earn %>% 
@@ -267,11 +265,9 @@ race_gender <- earn %>%
 ggplotly(race_gender)
 ```
 
-In addition, race is also an important factor to be considered in employment rate. In \@ref(fig:women-race), it is observed that most of the working population are white in each age group, especially between 25 to 54 years old which also is the prime working age. **People aged 25 to 54 years old and who are white accounts for more than half of the total workforce in the dataset, and more than 80% of the working populations across all age groups are White.** This extreme number is very concerning as Asians and Black or African American may in serious disadvantages or being treated unfairly in employment in the US.
+In addition, race is also an important factor to be considered in employment rate. In \@ref(fig:women-race), it is observed that most of the working population are white in each age group, especially between 25 to 54 years old which also is the prime working age. **People aged 25 to 54 years old and who are white accounts for more than half of the total workforce in the dataset, and more than 80% of the working populations across all age groups are White.** This extreme number is very concerning as Asians and Black or African Americans may be at serious disadvantages or being treated unfairly in employment in the US.
 
-**An interesting finding is that for Black or African Americans, women actually occupy slightly higher percentage in the workforce than men in all age groups**, indicates that there are more women working than men, which is the opposite to the overall trend and the trends observed in the other two races. This finding is supported by Banks (2019), who states that Black women have had the highest levels of labour market participation rate across all ages since 1880, one of the main reasons is the labour market discrimination against black men, which resulted in lower income and the women are forced to work to support their families. 
-
-Based on the findings above, it seems that Racism and sexism still persists in the US workplace. From an economic perspective, reducing gender gaps and avoiding racism can lead to increased GDP. Women and coloured races are pushed away from taking up paid jobs due to the stereotypical nature of many companies/people. However, there is hope and due to the modernisation, there will be equal opportunities for all genders and races.  
+**An interesting finding is that for Black or African Americans, women actually occupy a slightly higher percentage in the workforce than men in all age groups**, indicates that there are more women working than men, which is the opposite to the overall trend and the trends observed in the other two races. This finding is supported by Banks (2019), who states that Black women have had the highest levels of labour market participation rate across all ages since 1880, one of the main reasons is the labour market discrimination against black men, which resulted in lower-income and the women are forced to work to support their families. It seems that Racism and sexism still persist in the US workplace, women and coloured races are possibly being mistreated or not given equal opportunities in the workforce. 
 
 ## How do different factors affect the income between 2010 and 2020?
 
@@ -286,11 +282,11 @@ earn_all <- earn %>%
          age == "16 years and over")
 ```
 
-When taking a look at the earning data, median weekly income varies through different genders, races and age groups.
+When exploring the earning data, median weekly income varies through different genders, races and age groups.
 
 ### Gender & Race
 
-```{r fig5, fig.align = 'center', fig.cap="Race and gender do play significant role in income"}
+```{r fig5, fig.cap="Race and gender do play significant role in income"}
 earn %>%
   filter(sex != "Both Sexes",
          race != "All Races",
@@ -314,11 +310,11 @@ earn %>%
 
 ```
 
-Figure \@ref(fig:fig5) indicates that gender and race do play significant role in affecting weekly income through the past ten years. A clear upward trend in income can be observed in general over the period, the upper vertex of the segments represents male's income and the lower one represents female's, which clearly shows that men generally earn more than women in all years and races from 2010 to 2020. In addition, the plot suggests that race is also a key factor affecting income. **A surprising finding is that while the number of Asians employed are the lowest across all industries, Asians actually have the highest median weekly income among the three races recorded,** followed by the white race while the black or African American earns the least. This may reflect differences in the amount of time and energy that people of different races are willing to devote to their jobs, Asians are well-known for hard working and are more likely to work extra hours compare with the other two races. On the other hand, another possible reason is that there is a common belief that Asians are smart and tend to be educated for high-income occupations such as doctors and lawyers, while Black and African Americans may suffer from racial discrimination and are forced to work in low-income jobs.
+Figure \@ref(fig:fig5) indicates that gender and race do play significant roles in affecting weekly income through the past ten years. A clear upward trend in income can be observed in general over the period, the upper vertex of the segments represents male's income and the lower one represents female's, which clearly shows that men generally earn more than women in all years and races from 2010 to 2020. In addition, the plot suggests that race is also a key factor affecting income. **A surprising finding is that while the number of Asians employed are the lowest across all industries, Asians have the highest median weekly income among the three races recorded,** followed by the white race while the black or African American earns the least. This may reflect differences in the amount of time and energy that people of different races are willing to devote to their jobs, Asians are well-known for being hard-working and are more likely to work extra hours compare with the other two races. On the other hand, another possible reason is that there is a common belief that Asians are smart and tend to be educated for high-income occupations such as doctors and lawyers, while Black and African Americans may suffer from racial discrimination and are forced to work in low-income jobs.
 
 ### Age group
 
-```{r fig6, fig.align = 'center', fig.cap="Median weekly income by year and age group"}
+```{r fig6, fig.cap="Median weekly income by year and age group"}
 plot_theme <- theme_bw() +
   theme(
     panel.grid.major.x = element_blank(),
@@ -347,7 +343,7 @@ earn %>%
   transition_states(year)
 ```
 
-Based on Figure \@ref(fig:fig6), income levels at different age groups are all growing over the years. The Y-axis is divided by the minimum, 1/4 quantile, median, 3/4 quantile and maximum income of the total median weekly income. The plot interactively demonstrates that young adults earn much less than middle-aged people and there's not much difference between age groups over 35. The finding is reasonable based on common sense, where people at age of 16-24 are most likely school leavers and full-time students who are working part-time, the income for this group are lower considering the number of hours they can work each week and the skill level of the occupations/positions they can get. 25-34 years old on the other hand, are more likely in the earlier stage of their career and working in entry level positions, the wages for these positions are generally higher but still not as high as senior positions, where majority of the age group 35 and over are working in.
+Based on Figure \@ref(fig:fig6), income levels at different age groups are all growing over the years. The Y-axis is divided by the minimum, 1/4 quantile, median, 3/4 quantile and the maximum income of the total median weekly income. The plot interactively demonstrates that young adults earn much less than middle-aged people and there's not much difference between age groups over 35. The finding is reasonable based on common sense, where people at age of 16-24 are most likely school leavers and full-time students who are working part-time, the income for this group are lower considering the number of hours they can work each week and the skill level of the occupations/positions they can get. 25-34 years old on the other hand, are more likely in the earlier stage of their career and working in entry-level positions, the wages for these positions are generally higher but still not as high as senior positions, where the majority of the age group 35 and over are working in.
 
 
 ## How significant are gender and race affecting earnings?
@@ -378,9 +374,9 @@ ggplot(reg, aes(race, median_weekly_earn)) +
   scale_fill_discrete_qualitative()
 ```
 
-Figure \@ref(fig:fig7) compares the distribution of median weekly income of male and female together with the overall distribution (the boxes without colour), it is obvious that women has lower median weekly income than not only male, but also the overall level in all three races. In addition, it confirms the previous findings that Asian has the highest median weekly income whereas the lowest is observed in Black or African American. Furthermore, the spread of distribution is wider for male compare with female, which suggests the differences between high and low median weekly income is larger among men. The findings again, confirmed that both gender and race are significant factors in terms of earning, however, it is hard to suggest how much they are affecting the median weekly income, or which one is more significant than the other.
+Figure \@ref(fig:fig7) compares the distribution of median weekly income of males and females together with the overall distribution (the boxes without colour), it is obvious that women have lower median weekly income than not only males but also the overall level in all three races. In addition, it confirms the previous findings that Asian has the highest median weekly income whereas the lowest is observed in Black or African American. Furthermore, the spread of distribution is wider for males compared with females, which suggests the differences between high and low median weekly income is larger among men. The findings again, confirmed that both gender and race are significant factors in terms of earning, however, it is hard to suggest how much they are affecting the median weekly income, or which one is more significant than the other.
 
-A model is then introduced, however, before fitting a model to the data, an important factor to be considered is that **the earning data is time series data**, median weekly income naturally grows across all variables of interests over the years, assumption of independence and randomness is violated in this case. The best possible solution under this circumstances is to consider year as an additional categorical variable and include it in the model.
+A model is then introduced, however, before fitting a model to the data, an important factor to be considered is that **the earning data is time-series data**, median weekly income naturally grows across all variables of interests over the years, assumption of independence and randomness is violated in this case. The best possible solution under these circumstances is to consider year as an additional categorical variable and include it in the model.
 
 ```{r reg}
 model <- lm(median_weekly_earn ~ sex + race + year,
@@ -399,7 +395,7 @@ A linear regression model is then fitted as shown in Table \@ref(tab:reg), **the
 
 $$MedianWeeklyEarn = 909.3758 - 150.8788*Women - 278.7114*BlackorAfricanAmerican - 110.8727*White +...+271.833*Year2020$$
 
-According to the model, the median weekly income of women in general is 150.8788 dollars lower than women, whereas the median weekly income of Black or African American and White are 278.7114 and 110.8727 dollars lower compare with Asian respectively. Therefore, among all the variables of interest, **Black or African American in race has the most impact on median weekly income, followed by women and White in race.**
+According to the model, the median weekly income of women is 150.8788 dollars lower than women, whereas the median weekly income of Black or African American and White are 278.7114 and 110.8727 dollars lower compare with Asians respectively. Therefore, among all the variables of interest, **Black or African American has the most impact on median weekly income, followed by women and White.**
 
 Regression diagnostics for the model are also conducted to examine the goodness of fit, overall, the fitted model can explain part of the variations within the data, but there is room for improvements by introducing additional datasets and potentially more variables. 
 
@@ -407,7 +403,7 @@ Regression diagnostics for the model are also conducted to examine the goodness 
 resid_panel(model, plots = "SAS")
 ```
 
-Discreteness can be clearly observed from the residual plot in Figure \@ref(fig:fig8), it is mainly caused by the nature of the independent variables used in the model, all independent variables are categorical i.e. discrete in the model, hence the discreteness in residual plot is not surprising. In addition, both R squared and adjusted R squared for the fitted model is smaller than 0.5 as shown in Table \@ref(tab:fit), it suggests that only about 46% of the variation observed from the data is explained by the fitted model.
+Discreteness can be observed from the residual plot in Figure \@ref(fig:fig8), it is mainly caused by the nature of the independent variables used in the model, all independent variables are categorical i.e. discrete in the model, hence the discreteness in the residual plot is not surprising. In addition, both R squared and adjusted R squared for the fitted model is smaller than 0.5 as shown in Table \@ref(tab:fit), which suggests that only about 46% of the variation observed from the data is explained by the fitted model.
 
 ```{r fit}
 glance(model)%>% 
@@ -418,27 +414,27 @@ glance(model)%>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
-Based on the findings above, **race, specifically Black or African American has significant impact on median weekly earnings in the US from 2010 to 2020, followed by gender and White**. Epperson (2021) indicates that black women must work additional 214 days to catch up with what white men earned in 2020, this statement is confirmed by the model, as women who are Black or African American are in extreme disadvantages in the US workforce. However, the model could be improved by adding more datasets and new variables such as industry, education level etc., and the findings may subject to change if new model is fitted.
+Based on the findings above, **race, specifically Black or African American has a significant impact on median weekly earnings in the US from 2010 to 2020, followed by gender and White**. Epperson (2021) indicates that black women must work additional 214 days to catch up with what white men earned in 2020, this statement is confirmed by the model, as women who are Black or African American are at extreme disadvantages in the US workforce. However, the model could be improved by adding more datasets and new variables such as industry, education level etc., and the findings may be subject to change if a new model is fitted.
 
 
 # Key Findings and Limitations
 
-The overall employment status remains stable in the US from 2015 to 2018, the COVID-19 pandemic exerted huge impacts on multiple industries from 2019, especially leisure and hospitality, however, public administration experienced a slight increase in number of people employed during pandemic due to the nature of the jobs.
+The overall employment status remains stable in the US from 2015 to 2018, the COVID-19 pandemic exerted huge impacts on multiple industries from 2019, especially leisure and hospitality, however, public administration experienced a slight increase in the number of people employed during the pandemic due to the nature of the jobs.
 
-In general, more males are employed than female across industries as well as age groups in the US, and white people account for about 80% of the total working population in the workforce. Industries that generally require more physical labor and technical skills are overwhelmingly dominated by male, whereas industries with more women generally require more patience and carefulness. However, for Black or African Americans, there are more women working than men, which could be the result of lower payment for black men and results in higher labour participation by women to support their families.
+In general, more males are employed than females across industries as well as age groups in the US, and white people account for about 80% of the total working population in the workforce. Industries that generally require more physical labour and technical skills are overwhelmingly dominated by males, whereas industries with more women generally require more patience and carefulness. However, for Black or African Americans, more women are working than men, which could be the result of lower payment for black men and results in higher labour participation by women to support their families.
 
-In terms of earnings, men generally earn more than women, and younger age groups also turns to earn less compare with those who are 35 years old and over. An interesting findings is discovered in exploring the race factor, although Asians occupy the least proportion in number of people employed, they have higher median weekly income than White people, which have significantly higher number of people employed across industries. Black or African Americans are earning the least and with very low number of people employed across industries. The regression model also supports these findings and demonstrates that Black or African American is the most significant variable result in earning lower median weekly income, followed by women and White.
+In terms of earnings, men generally earn more than women, and younger age groups also turn to earn less compare with those who are 35 years old and over. An interesting finding is discovered in exploring the race factor, although Asians occupy the least proportion in the number of people employed, they have a higher median weekly income than White people, which have a significantly higher number of people employed across industries. Black or African Americans are earning the least and with a very low number of people employed across industries. The regression model also supports these findings and demonstrates that Black or African American is the most significant variable result in earning lower median weekly income, followed by women and White.
 
-In terms of limitations, the period of records in the two datasets used are different, employment dataset is recorded from 2015 to 2020 whereas earning contains data from 2010 to 2020, the inadequateness could lead to biased findings and conclusions. In addition, the findings of people aged 55 years and over work the most is not convincing, additional datasets from different data sources with a longer time line will certainly be useful to draw more precise conclusions in future studies.
+In terms of limitations, the period of records in the two datasets used are different, employment dataset is recorded from 2015 to 2020 whereas earning contains data from 2010 to 2020, the inadequateness could lead to biased findings and conclusions. In addition, the findings of people aged 55 years and over account for the largest proportion of the working population is not convincing, additional datasets from different data sources with a longer timeline will certainly be useful to draw more precise conclusions in future studies.
 
 
 # Conclusion
 
-Based on the findings, it is proved that gender and race do play significant roles in both employment and earning across industries and age groups in the US. Gender equality is still a concerning issue after all these years, males are earning higher income than women in general, and males are dominating majority of the industries. This trend can be observed across all age groups, and although women account for slightly higher proportion in workforce than men under Black or African Americans, it is mainly caused by the lower income earned by Black or African American men, which brings out the issue of racism. 
+Based on the findings, it is proved that gender and race do play significant roles in both employment and earning across industries and age groups in the US. Gender equality is still a concerning issue after all these years, males are earning higher incomes than women in general, and males are dominating the majority of the industries. This trend can be observed across all age groups, and although women account for a slightly higher proportion in the workforce than men under Black or African Americans, it is mainly caused by the lower-income earned by Black or African American men, which brings out the issue of racism. 
 
-White race account for significantly higher proportion in number of people employed in all industries across all age groups, the number is higher than the double of both Asian and Black or African American combined in some cases. The astonishing gap suggests the other races could be mistreated and not given equal opportunities in employment, however, Asians managed to earn higher weekly income than White people despite they account for the least proportion in number of people employed. On the other hand, Black or African American is in disadvantages in both employment and earning, this is also confirmed by the fitted model that being a Black or African American will results in about 279 dollars less in median weekly income, and the situation is worse if a person is Black or African American and a woman, an extra of 151 dollars will be taken off the median weekly income for women.
+White race accounts for significantly higher proportions in the number of people employed in all industries across all age groups, the number is higher than the double of both Asian and Black or African American combined in some cases. The astonishing gap suggests the other races could be mistreated and not given equal opportunities in employment, however, Asians managed to earn higher weekly income than White people despite they account for the least proportion in the number of people employed. On the other hand, Black or African Americans are at disadvantages in both employment and earnings, this is also confirmed by the fitted model that being a Black or African American will results in about 279 dollars less in median weekly income, and the situation is worse if a person is Black or African American and a woman, an extra of 151 dollars will be taken off the median weekly income for women.
 
-Overall, workplace discrimination and mistreatment can be observed from both gender and race in the US workforce, Black or African American women are in particular disadvantages among all groups. Although the situation may be getting better compare with decades ago, it still requires continuous efforts to truly achieve equality and fair opportunities for all residents in the US.
+Overall, potential discrimination and mistreatment could be observed from both gender and race in the US workforce, it seems that Racism and sexism may persist in the US workplace, and Black or African American women are at particular disadvantages among all groups. Although the situation may be getting better compares with decades ago, it still requires continuous efforts to achieve equality for all residents in the US, there is hope that there will be equal opportunities for all genders and races in future. 
 
 
 # References
