@@ -102,7 +102,7 @@ Based on the datasets, five questions are going to be explored and analyzed in t
  
 - What are the demographic differences between industries from 2015 to 2020?
 
-- At what age do men and women work the most and how does the age factor contribute towards employment?
+- How gender and race affecting employment rate within age groups?
 
 - How do different factors affect the income between 2010 and 2020?
 
@@ -196,10 +196,18 @@ plotly::ggplotly(p)
 According to Figure \@ref(fig:fig3), when looking at the distribution of races across industries in the US, most of the people employed among all the industries are white people, following by Black or African American and Asian. **The number of people employed who are white is significantly higher than both African American and Asian combined in all industries, although it may align with the distribution of races in total population, the large gap is still concerning and it may suggests possible discrimination in the workforce.**
 
 
-## At what age do men and women work the most and how does the age factor contribute towards employement?
+## How gender and race affecting employment rate within age groups?
 
 ```{r fig4, fig.cap="Employment rate by gender and age group"}
-total <- sum(earn$n_persons)
+total <- earn %>% 
+  filter(sex %in% c("Men", "Women"),
+         age %in% c("16 to 24 years", 
+                    "25 to 34 years", 
+                    "35 to 44 years", 
+                    "45 to 54 years", 
+                    "55 years and over")) %>% 
+  summarise(total = sum(n_persons))
+
 fig4 <- earn %>% 
   filter(sex %in% c("Men", "Women"),
          age %in% c("16 to 24 years", 
@@ -208,7 +216,7 @@ fig4 <- earn %>%
                     "45 to 54 years", 
                     "55 years and over")) %>% 
   group_by(sex, age) %>% 
-  summarise(percent = 100 * sum(n_persons)/total) %>% 
+  summarise(percent = 100 * sum(n_persons)/total[[1]]) %>% 
   ggplot(aes(x = age, y = percent, fill = sex)) + 
   geom_col(position = "dodge") +
   theme_bw() + 
@@ -221,23 +229,49 @@ fig4 <- earn %>%
 ggplotly(fig4)
 ```
 
-It can be observed from Figure \@ref(fig:fig4) that both men and women in between the age 16 to 54 have been employed more when compared to other age groups. It is also evident that the number of male employees are more when compared to women. There is a peak in 25-54 age group as this is the age when people finish education and start their career. This also happens to be the prime working time in most of their lives. As one intends the curve to be, there is a peak and the 25-54 age group and the numbers slowly go down after 55 years as people start their retirement phase. It can be observed that there is approximately 20% difference in between the men and women working population.
+It can be observed from Figure \@ref(fig:fig4) that the percentage of male that actively working and earning is about 2% higher than female across all age groups, which also raise the concern of gender equality and discrimination in employment. The proportion of people in 25-54 age group is slightly higher than the other age groups except 55 years and over, it is reasonable as people in this age group are expected to finish education and start their career. **A surprising finding is that people aged 55 years and over occupy the highest proportion (around 30%) of the total working population, it is in contrary to the common belief that people are most likely retired at this age.** It could be explained by the aging population, or high demand of experienced professionals at older ages, However, it could also be caused by the biased samples collected in the dataset, which requires further researches with additional datasets for cross checking. 
 
-```{r women-race, fig.cap="Employment rate by gender and age group"}
-earn %>% 
-  filter(sex == "Women" & race != "All Races") %>% 
-  group_by(race, year) %>% 
-  summarise(total = sum(n_persons)) %>% 
-  ggplot(aes(x = year, y = total, color = race)) + 
-  geom_line() +
-  scale_x_continuous(breaks = seq(2010, 2020, by = 2)) + 
+```{r women-race, fig.cap="Employment rate by gender and race within each age group"}
+race_tt <- earn %>% 
+  filter(race %in% c("White",
+                     "Asian",
+                     "Black or African American"),
+         sex %in% c("Men",
+                    "Women"),
+         age %in% c("16 to 24 years",
+                    "25 to 54 years",
+                    "55 years and over")) %>% 
+  summarise(total = sum(n_persons))
+
+race_gender <- earn %>% 
+  filter(race %in% c("White",
+                     "Asian",
+                     "Black or African American"),
+         sex %in% c("Men",
+                    "Women"),
+         age %in% c("16 to 24 years",
+                    "25 to 54 years",
+                    "55 years and over")) %>% 
+  group_by(sex, race, age) %>% 
+  summarise(percent = 100 * sum(n_persons)/race_tt[[1]]) %>% 
+  ggplot(aes(x = race, y = percent, fill = sex)) + 
+  geom_col(position = "dodge") +
   theme_bw() + 
-  theme(axis.text.x = element_text(angle = 90))
+  scale_y_continuous(labels = scales::label_percent(scale = 1)) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(x = "",
+       y = "",
+       fill = "Gender") +
+  facet_wrap(~age)
+
+ggplotly(race_gender)
 ```
 
-In \@ref(fig:women-race), it is observed that most of the working women population are white. This could be due to workplace politics where women of color are treated unfairly. However, we can notice a betterment in the situation of the Asian and the African American population in the year 2019. There is also a question as to if the data is representing the working population only in the US or the whole wide world. 
+In addition, race is also an important factor to be considered in employment rate. In \@ref(fig:women-race), it is observed that most of the working population are white in each age group, especially between 25 to 54 years old which also is the prime working age. **People aged 25 to 54 years old and who are white accounts for more than half of the total workforce in the dataset, and more than 80% of the working populations across all age groups are White.** This extreme number is very concerning as Asians and Black or African American may in serious disadvantages or being treated unfairly in employment in the US.
 
-Racism and sexism still persists in and around us. From an economic perspective, reducing gender gaps and avoiding racism can lead to increased GDP. Women are pushed away from taking up paid jobs due to the stereotypical nature of many companies/people. However, there is hope and due to the modernisation, there will be better opportunities for women.  
+**An interesting finding is that for Black or African Americans, women actually occupy slightly higher percentage in the workforce than men in all age groups**, indicates that there are more women working than men, which is the opposite to the overall trend and the trends observed in the other two races. This finding is supported by Banks (2019), who states that Black women have had the highest levels of labour market participation rate across all ages since 1880, one of the main reasons is the labour market discrimination against black men, which resulted in lower income and the women are forced to work to support their families. 
+
+Based on the findings above, it seems that Racism and sexism still persists in the US workplace. From an economic perspective, reducing gender gaps and avoiding racism can lead to increased GDP. Women and coloured races are pushed away from taking up paid jobs due to the stereotypical nature of many companies/people. However, there is hope and due to the modernisation, there will be equal opportunities for all genders and races.  
 
 ## How do different factors affect the income between 2010 and 2020? - Rachel to edit
 
@@ -396,6 +430,8 @@ In terms of limitations, the period of records in the two datasets used are diff
 
 
 # References
+
+Banks, N. (2019). Black women’s labor market history reveals deep-seated race and gender discrimination. **Economic Policy Institute.** Retrieved from https://www.epi.org/blog/black-womens-labor-market-history-reveals-deep-seated-race-and-gender-discrimination/
 
 Fekedulegn.D, Alterman.T, Charles.L, Kershaw.K, Safford.M, Howard.V, MacDonald.L (2019).Prevalence of workplace discrimination and mistreatment in a national sample of older U.S. workers: The REGARDS cohort study, *SSM - Population Health,* Volume 8, 100444, ISSN 2352-8273, https://doi.org/10.1016/j.ssmph.2019.100444.
 
